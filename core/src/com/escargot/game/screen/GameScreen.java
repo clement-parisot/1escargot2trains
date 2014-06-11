@@ -35,7 +35,6 @@ public class GameScreen implements Screen {
 	OrthographicCamera camera;
 
 	Texture tex_train;
-	Texture tex_faster, tex_faster_actif;
 
 	Escargot obj_escargot;
 	Train obj_trainG;
@@ -74,8 +73,6 @@ public class GameScreen implements Screen {
 
 		// Textures
 		tex_train = new Texture(Gdx.files.internal("train_0.png"));
-		tex_faster = new Texture(Gdx.files.internal("faster.png"));
-		tex_faster_actif = new Texture(Gdx.files.internal("faster_actif.png"));
 
 		// Objets
 		obj_escargot = new Escargot(1920 / 2 - 32 / 2, 20, 32, 20,
@@ -265,19 +262,7 @@ public class GameScreen implements Screen {
 		game.batch.setProjectionMatrix(cam2.combined);
 		game.font.draw(game.batch, score.toString(), 340 - score.toString()
 				.length() / 2 * 20, 150);
-		if (!faster) {
-			if (obj_escargot.getDirection() != 1) {
-				game.batch.draw(tex_faster, 288, 240, 64, 64);
-			} else {
-				game.batch.draw(tex_faster, 352, 240, -64, 64);
-			}
-		} else {
-			if (obj_escargot.getDirection() != 1) {
-				game.batch.draw(tex_faster_actif, 288, 240, 64, 64);
-			} else {
-				game.batch.draw(tex_faster_actif, 352, 240, -64, 64);
-			}
-		}
+
 		game.batch.end();
 		game.sr.begin(ShapeType.Filled);
 		game.sr.setProjectionMatrix(cam2.combined);
@@ -331,9 +316,6 @@ public class GameScreen implements Screen {
 			effects.get(i).free();
 		effects.clear();
 		mort.dispose();
-
-		tex_faster.dispose();
-		tex_faster_actif.dispose();
 
 		fumee.dispose();
 	}
