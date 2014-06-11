@@ -1,16 +1,74 @@
 package com.escargot.game.android;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.RelativeLayout;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.IActivityRequestHandler;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 
-public class AndroidLauncher extends AndroidApplication {
+public class AndroidLauncher extends AndroidApplication implements
+		IActivityRequestHandler {
+
+	protected AdView adView;
+
+	private final int SHOW_ADS = 1;
+	private final int HIDE_ADS = 0;
+
+	@SuppressLint("HandlerLeak")
+	protected Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case SHOW_ADS: {
+				adView.setVisibility(View.VISIBLE);
+				break;
+			}
+			case HIDE_ADS: {
+				adView.setVisibility(View.GONE);
+				break;
+			}
+			}
+		}
+	};
+
 	@Override
-	protected void onCreate (Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new EscargotGame(), config);
+		RelativeLayout layout = new RelativeLayout(this);
+		View gameView = initializeForView(new EscargotGame(this), config);
+		adView = new AdView(this);
+		adView.setAdUnitId("***REMOVED***");
+		adView.setAdSize(AdSize.SMART_BANNER);
+		// Initiez une demande générique.
+		AdRequest adRequest = new AdRequest.Builder().addTestDevice(
+				AdRequest.DEVICE_ID_EMULATOR).build();
+		adView.loadAd(adRequest);
+		layout.addView(gameView);
+		RelativeLayout.LayoutParams adParams = new RelativeLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		adParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		adParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		layout.addView(adView, adParams);
+		setContentView(layout);
 	}
+
+	// This is the callback that posts a message for the handler
+	@Override
+	public void showAds(boolean show) {
+		handler.sendEmptyMessage(show ? SHOW_ADS : HIDE_ADS);
+	}
+	
+	@Override public void onPause() { adView.pause(); super.onPause(); }
+	@Override public void onResume() { super.onResume(); adView.resume(); }
+	@Override public void onDestroy() { adView.destroy(); super.onDestroy();}
 }
