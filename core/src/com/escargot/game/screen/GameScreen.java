@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -88,8 +90,13 @@ public class GameScreen implements Screen {
 
 		score = new Score();
 		score.resetScore();
-		MyInputProcessor inputProcessor = new MyInputProcessor();
-		Gdx.input.setInputProcessor(inputProcessor);
+		InputMultiplexer im = new InputMultiplexer();
+		MyInputProcessorKey inputProcessorKey = new MyInputProcessorKey();
+		MyInputProcessorTouch inputProcessorTouch = new MyInputProcessorTouch();
+		im.addProcessor(new GestureDetector(inputProcessorTouch));
+		im.addProcessor(inputProcessorKey);
+		Gdx.input.setInputProcessor(im);
+
 		effects = new Array<PooledEffect>();
 		fumee = new ParticleEffect();
 		fumee.load(Gdx.files.internal("fumee_train"), Gdx.files.internal(""));
@@ -106,7 +113,7 @@ public class GameScreen implements Screen {
 		effects.add(effect2);
 	}
 
-	public class MyInputProcessor implements InputProcessor, GestureListener {
+	public class MyInputProcessorKey implements InputProcessor {
 
 		@Override
 		public boolean keyDown(int keycode) {
@@ -115,34 +122,33 @@ public class GameScreen implements Screen {
 				obj_escargot.vitesse = 120;
 				obj_escargot.flip(0);
 				;
-				return false;
+				return true;
 			}
 			if (keycode == Keys.RIGHT) {
 				faster = true;
 				obj_escargot.vitesse = 120;
 				obj_escargot.flip(640);
 				;
-				return false;
+				return true;
 			}
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean keyUp(int keycode) {
 			faster = false;
 			obj_escargot.vitesse = 40;
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean keyTyped(char character) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean touchDown(int screenX, int screenY, int pointer,
 				int button) {
-			obj_escargot.flip(0);
 			return true;
 		}
 
@@ -150,58 +156,65 @@ public class GameScreen implements Screen {
 		public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 			faster = false;
 			obj_escargot.vitesse = 40;
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean touchDragged(int screenX, int screenY, int pointer) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean scrolled(int amount) {
-			return false;
+			return true;
 		}
+	}
+
+	public class MyInputProcessorTouch implements GestureListener {
 
 		@Override
 		public boolean touchDown(float x, float y, int pointer, int button) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean tap(float x, float y, int count, int button) {
-			return false;
+			obj_escargot.flip(0);
+			faster = false;
+			obj_escargot.vitesse = 40;
+			return true;
 		}
 
 		@Override
 		public boolean longPress(float x, float y) {
-			obj_escargot.vitesse = 140;
-			return false;
+			obj_escargot.vitesse = 120;
+			faster = true;
+			return true;
 		}
 
 		@Override
 		public boolean fling(float velocityX, float velocityY, int button) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean pan(float x, float y, float deltaX, float deltaY) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean panStop(float x, float y, int pointer, int button) {
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean zoom(float initialDistance, float distance) {
-			return false;
+			return true;
 		}
 
 		@Override
@@ -212,33 +225,11 @@ public class GameScreen implements Screen {
 
 	}
 
-	private void handleInput() {
-		/******************
-		int x = Gdx.input.getX();
-		if (Gdx.input.justTouched()) {
-			faster = false;
-			obj_escargot.vitesse = 40;
-			obj_escargot.flip(x);
-		}
-		if (Gdx.input.isTouched()) {
-			if (x > Gdx.graphics.getWidth() - 64 || x < 64) {
-				obj_escargot.vitesse = 120;
-				faster = true;
-			} else {
-				obj_escargot.vitesse = 40;
-				faster = false;
-			}
-		}
-		*************/
-		
-	}
-
 	@Override
 	public void render(float delta) {
 		float dist = Math.min(Math.abs(obj_escargot.x - obj_trainG.x - 355),
 				Math.abs(obj_trainD.x - obj_escargot.x - 32));
 		if (!end) {
-			handleInput();
 			move(delta);
 			score_update(dist, delta);
 		}
@@ -272,18 +263,19 @@ public class GameScreen implements Screen {
 			}
 		}
 		game.batch.setProjectionMatrix(cam2.combined);
-		game.font.draw(game.batch, score.toString(), 320 - score.toString()
-				.length() / 2 * 25, 150);
+		game.font.draw(game.batch, score.toString(), 340 - score.toString()
+				.length() / 2 * 20, 150);
 		if (!faster) {
-			game.batch.draw(tex_faster, 576, 240, 64, 64);
-			game.batch.draw(tex_faster, 64, 240, -64, 64);
+			if (obj_escargot.getDirection() != 1) {
+				game.batch.draw(tex_faster, 288, 240, 64, 64);
+			} else {
+				game.batch.draw(tex_faster, 352, 240, -64, 64);
+			}
 		} else {
 			if (obj_escargot.getDirection() != 1) {
-				game.batch.draw(tex_faster_actif, 576, 240, 64, 64);
-				game.batch.draw(tex_faster, 64, 240, -64, 64);
+				game.batch.draw(tex_faster_actif, 288, 240, 64, 64);
 			} else {
-				game.batch.draw(tex_faster, 576, 240, 64, 64);
-				game.batch.draw(tex_faster_actif, 64, 240, -64, 64);
+				game.batch.draw(tex_faster_actif, 352, 240, -64, 64);
 			}
 		}
 		game.batch.end();
@@ -291,7 +283,7 @@ public class GameScreen implements Screen {
 		game.sr.setProjectionMatrix(cam2.combined);
 		game.sr.setColor(Math.max(0.0f, 1.0f - dist / 925.0f),
 				Math.min(dist / 925.0f, 1.0f), 0.1f, 1);
-		game.sr.rect(300, 170, dist / 8, 20);
+		game.sr.rect(288, 170, dist / 8, 20);
 
 		game.sr.end();
 		if (!end) {
