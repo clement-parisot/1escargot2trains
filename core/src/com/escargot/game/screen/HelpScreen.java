@@ -4,18 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.escargot.game.EscargotGame;
 
 public class HelpScreen implements Screen {
 
 	final EscargotGame game;
 	private OrthographicCamera camera;
+	private Texture retour;
 
 	public HelpScreen(EscargotGame game) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 640, 480);
+		retour = new Texture(Gdx.files.internal("back.png"));
 	}
 
 	@Override
@@ -30,11 +33,11 @@ public class HelpScreen implements Screen {
 		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
 		game.font.drawWrapped(game.batch, game.help, 20, 350, 620);
 		game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
+		game.batch.draw(retour, 0, 0, 64, 64);
 		game.batch.end();
 
 		if (Gdx.input.justTouched()) {
-			game.setScreen(new MainMenuScreen(game));
-			dispose();
+			game.setScreen(game.mainMenuScreen);
 		}
 	}
 
@@ -62,6 +65,7 @@ public class HelpScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		retour.dispose();
 	}
 
 }

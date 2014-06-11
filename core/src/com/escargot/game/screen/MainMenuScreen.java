@@ -65,8 +65,7 @@ public class MainMenuScreen implements Screen {
 				EscargotGame.son_on = !EscargotGame.son_on;
 			} else if (x > Gdx.graphics.getWidth() - 64
 					&& y > Gdx.graphics.getHeight() - 64) {
-				game.setScreen(new HelpScreen(game));
-				dispose();
+				game.setScreen(game.helpScreen);
 			} else if (x > Gdx.graphics.getWidth() / 2 - 32
 					&& x < Gdx.graphics.getWidth() / 2 + 32
 					&& y > Gdx.graphics.getHeight() - 64) {
@@ -75,7 +74,6 @@ public class MainMenuScreen implements Screen {
 					Gdx.input.vibrate(1000);
 			} else {
 				game.setScreen(new GameScreen(game));
-				dispose();
 			}
 		}
 	}

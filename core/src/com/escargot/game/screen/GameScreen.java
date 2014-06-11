@@ -41,7 +41,7 @@ public class GameScreen implements Screen {
 	Train obj_trainD;
 	List<AbstractGameObject> listeTrains;
 
-	Score score;
+	private Score score_game;
 	final EscargotGame game;
 	float zoom_factor;
 	private OrthographicCamera cam2;
@@ -50,7 +50,7 @@ public class GameScreen implements Screen {
 	ParticleEffectPool fumeePool, mortPool;
 	Array<PooledEffect> effects;
 
-	boolean faster = false;
+	private boolean faster = false;
 	private ParticleEffect mort;
 	private boolean end = false;
 	private PooledEffect mortEffect;
@@ -85,8 +85,7 @@ public class GameScreen implements Screen {
 		listeTrains.add(obj_trainD);
 		listeTrains.add(obj_trainG);
 
-		score = new Score();
-		score.resetScore();
+		score_game = new Score();
 		InputMultiplexer im = new InputMultiplexer();
 		MyInputProcessorKey inputProcessorKey = new MyInputProcessorKey();
 		MyInputProcessorTouch inputProcessorTouch = new MyInputProcessorTouch();
@@ -255,13 +254,12 @@ public class GameScreen implements Screen {
 		if (end) {
 			mortEffect.draw(game.batch, delta);
 			if (mortEffect.isComplete()) {
-				game.setScreen(new EndScreen(game, score));
-				dispose();
+				end_game();
 			}
 		}
 		game.batch.setProjectionMatrix(cam2.combined);
-		game.font.draw(game.batch, score.toString(), 340 - score.toString()
-				.length() / 2 * 20, 150);
+		game.font.draw(game.batch, score_game.toString(), 340 - score_game
+				.toString().length() / 2 * 20, 150);
 
 		game.batch.end();
 		game.sr.begin(ShapeType.Filled);
@@ -285,13 +283,19 @@ public class GameScreen implements Screen {
 		}
 	}
 
+	private void end_game() {
+		game.score_player= score_game;
+		game.setScreen(game.endScreen);
+		dispose();
+	}
+
 	private void score_update(float dist, float delta) {
 		float x = 0.0f;
 		if (dist < 600) {
 			x = ((600 - dist) / 600);
 		}
 		double pas = Math.floor(1.0 + 100.0 * Math.pow(x, 10));
-		score.setScore(pas * 2.0 * delta);
+		score_game.setScore(pas * 2.0 * delta);
 	}
 
 	private void camera_zoom(float dist) {
