@@ -16,11 +16,14 @@ import com.escargot.game.IActivityRequestHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.example.games.basegameutils.BaseGameActivity;
 
-public class AndroidLauncher extends AndroidApplication implements
+public class AndroidLauncher extends BaseGameActivity implements
 		IActivityRequestHandler {
 
 	protected AdView adView;
+
+	private final static String TAG = "AndroidLauncher";
 
 	private final int SHOW_ADS = 1;
 	private final int HIDE_ADS = 0;
@@ -52,8 +55,12 @@ public class AndroidLauncher extends AndroidApplication implements
 		adView.setAdUnitId("***REMOVED***");
 		adView.setAdSize(AdSize.SMART_BANNER);
 		// Initiez une demande générique.
-		AdRequest adRequest = new AdRequest.Builder().addTestDevice(
-				AdRequest.DEVICE_ID_EMULATOR).build();
+		final String id1 = "***REMOVED***";
+		final String id2 = "***REMOVED***";
+		AdRequest adRequest = new AdRequest.Builder()
+				.addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice(id1)
+				.addTestDevice(id2).build();
+
 		adView.loadAd(adRequest);
 		layout.addView(gameView);
 		RelativeLayout.LayoutParams adParams = new RelativeLayout.LayoutParams(
@@ -101,5 +108,17 @@ public class AndroidLauncher extends AndroidApplication implements
 	@Override
 	protected void onActivityResult(int request, int response, Intent data) {
 		super.onActivityResult(request, response, data);
+	}
+
+	@Override
+	public void onSignInFailed() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSignInSucceeded() {
+		// TODO Auto-generated method stub
+		
 	}
 }

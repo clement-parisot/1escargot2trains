@@ -47,7 +47,7 @@ public class EndScreen implements Screen {
 		game.batch.end();
 
 		if (Gdx.input.justTouched()) {
-			if(Gdx.input.getX() < 64 && Gdx.input.getY() > 416)
+			if(Gdx.input.getX() < 64 && Gdx.input.getY() > Gdx.graphics.getHeight() - 64)
 				game.setScreen(game.mainMenuScreen);
 			else
 				game.setScreen(new GameScreen(game));
