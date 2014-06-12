@@ -104,6 +104,8 @@ public abstract class BaseGameActivity extends AndroidApplication implements
             getGameHelper();
         }
         mHelper.setup(this);
+        mHelper.enableDebugLog(true);
+        mHelper.setMaxAutoSignInAttempts(1);
     }
 
     @Override

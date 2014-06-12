@@ -13,14 +13,15 @@ public class EndScreen implements Screen {
 
 	final EscargotGame game;
 	private OrthographicCamera camera;
-	private Texture retour;
-	
+	private Texture retour, noter;
+
 	public EndScreen(final EscargotGame game, final Score score) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 640, 480);
 		retour = new Texture(Gdx.files.internal("back.png"));
+		noter = new Texture(Gdx.files.internal("star.png"));
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		prefs.putBoolean("son_on", EscargotGame.son_on);
 		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
@@ -39,18 +40,26 @@ public class EndScreen implements Screen {
 		game.batch.begin();
 		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
 		game.font.draw(game.batch, game.gameover, 250, 350);
-		game.font.draw(game.batch, game.score_txt + game.score_player, 200, 300);
-		game.font.draw(game.batch, game.bestscore_txt + game.score_player.getMaxScore(),
-				200, 275);
+		game.font
+				.draw(game.batch, game.score_txt + game.score_player, 200, 300);
+		game.font.draw(game.batch,
+				game.bestscore_txt + game.score_player.getMaxScore(), 200, 275);
 		game.batch.draw(game.tex_escargot, 200, 20, 312, 198);
 		game.batch.draw(retour, 0, 0, 64, 64);
+		game.batch.draw(noter, 576, 0, 64, 64);
 		game.batch.end();
 
 		if (Gdx.input.justTouched()) {
-			if(Gdx.input.getX() < 64 && Gdx.input.getY() > Gdx.graphics.getHeight() - 64)
+			if (Gdx.input.getX() < 64
+					&& Gdx.input.getY() > Gdx.graphics.getHeight() - 64) {
 				game.setScreen(game.mainMenuScreen);
-			else
+			} else if (Gdx.input.getX() > Gdx.graphics.getWidth() - 64
+					&& Gdx.input.getY() > Gdx.graphics.getHeight() - 64) {
+				// aide
+				game.myRequestHandler.rateApp();
+			} else {
 				game.setScreen(new GameScreen(game));
+			}
 		}
 	}
 
@@ -79,6 +88,7 @@ public class EndScreen implements Screen {
 	@Override
 	public void dispose() {
 		retour.dispose();
+		noter.dispose();
 	}
 
 }

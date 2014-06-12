@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.escargot.game.SigningResolver;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.IActivityRequestHandler;
 import com.google.android.gms.ads.AdRequest;
@@ -27,6 +29,8 @@ public class AndroidLauncher extends BaseGameActivity implements
 
 	private final int SHOW_ADS = 1;
 	private final int HIDE_ADS = 0;
+	private final int RATE_APP = 2;
+	private boolean signInSuccess = false;
 
 	@SuppressLint("HandlerLeak")
 	protected Handler handler = new Handler() {
@@ -40,6 +44,9 @@ public class AndroidLauncher extends BaseGameActivity implements
 			case HIDE_ADS: {
 				adView.setVisibility(View.GONE);
 				break;
+			}
+			case RATE_APP:{
+				AppRater.showRateDialog(adView.getContext());
 			}
 			}
 		}
@@ -69,6 +76,7 @@ public class AndroidLauncher extends BaseGameActivity implements
 		adParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
 		layout.addView(adView, adParams);
 		setContentView(layout);
+		AppRater.app_launched(this);
 	}
 
 	// This is the callback that posts a message for the handler
@@ -112,13 +120,33 @@ public class AndroidLauncher extends BaseGameActivity implements
 
 	@Override
 	public void onSignInFailed() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("anotherday...");
+		this.signInSuccess = false;
 	}
 
 	@Override
 	public void onSignInSucceeded() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("success");
+		this.signInSuccess = true;
+	}
+
+	@Override
+	public boolean isSignedIn() {
+		return mHelper.isSignedIn();
+	}
+
+	@Override
+	public void beginUserSignIn() {
+		this.beginUserInitiatedSignIn();
+	}
+
+	@Override
+	public void signOutUser() {
+		this.signOut();
+	}
+
+	@Override
+	public void rateApp() {
+		handler.sendEmptyMessage(RATE_APP);
 	}
 }

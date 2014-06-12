@@ -11,7 +11,7 @@ import com.escargot.game.EscargotGame;
 
 public class MainMenuScreen implements Screen {
 	final EscargotGame game;
-	Texture tex_son_on, tex_son_off, aide, vibre_on, vibre_off;
+	Texture tex_son_on, tex_son_off, aide, vibre_on, vibre_off, tex_score;
 
 	OrthographicCamera camera;
 
@@ -27,8 +27,9 @@ public class MainMenuScreen implements Screen {
 		vibre_on = new Texture(Gdx.files.internal("vibre_on.png"));
 		vibre_off = new Texture(Gdx.files.internal("vibre_off.png"));
 		aide = new Texture(Gdx.files.internal("aide.png"));
-		
-		//Pub
+		tex_score = new Texture(Gdx.files.internal("score.png"));
+
+		// Pub
 		game.myRequestHandler.showAds(true);
 	}
 
@@ -42,15 +43,22 @@ public class MainMenuScreen implements Screen {
 
 		game.batch.begin();
 		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
+
+		// son
 		if (EscargotGame.son_on)
 			game.batch.draw(tex_son_on, 0, 0, 64, 64);
 		else
 			game.batch.draw(tex_son_off, 0, 0, 64, 64);
+		// vibreur
 		if (EscargotGame.vibre_on)
-			game.batch.draw(vibre_on, 288, 0, 64, 64);
+			game.batch.draw(vibre_on, 64, 0, 64, 64);
 		else
-			game.batch.draw(vibre_off, 288, 0, 64, 64);
+			game.batch.draw(vibre_off, 64, 0, 64, 64);
+		// score
+		game.batch.draw(tex_score, 512, 0, 64, 64);
+		// aide
 		game.batch.draw(aide, 576, 0, 64, 64);
+
 		game.font.drawWrapped(game.batch, game.mainscreen1, 120, 300, 400,
 				HAlignment.CENTER);
 		game.font.drawWrapped(game.batch, game.mainscreen2, 120, 250, 400,
@@ -61,18 +69,26 @@ public class MainMenuScreen implements Screen {
 		if (Gdx.input.justTouched()) {
 			int x = Gdx.input.getX();
 			int y = Gdx.input.getY();
+
 			if (x < 64 && y > Gdx.graphics.getHeight() - 64) {
+				// son
 				EscargotGame.son_on = !EscargotGame.son_on;
 			} else if (x > Gdx.graphics.getWidth() - 64
 					&& y > Gdx.graphics.getHeight() - 64) {
+				// aide
 				game.setScreen(game.helpScreen);
-			} else if (x > Gdx.graphics.getWidth() / 2 - 32
-					&& x < Gdx.graphics.getWidth() / 2 + 32
-					&& y > Gdx.graphics.getHeight() - 64) {
+			} else if (x > 64 && x < 128 && y > Gdx.graphics.getHeight() - 64) {
+				// vibreur
 				EscargotGame.vibre_on = !EscargotGame.vibre_on;
 				if (EscargotGame.vibre_on)
 					Gdx.input.vibrate(1000);
+			} else if (x > Gdx.graphics.getWidth() - 128
+					&& x < Gdx.graphics.getWidth() - 64
+					&& y > Gdx.graphics.getHeight() - 64) {
+				// score
+				game.setScreen(new ScoreScreen(game));
 			} else {
+				// jeu
 				game.setScreen(new GameScreen(game));
 			}
 		}
@@ -107,6 +123,7 @@ public class MainMenuScreen implements Screen {
 		aide.dispose();
 		vibre_on.dispose();
 		vibre_off.dispose();
+		tex_score.dispose();
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		prefs.putBoolean("son_on", EscargotGame.son_on);
 		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);

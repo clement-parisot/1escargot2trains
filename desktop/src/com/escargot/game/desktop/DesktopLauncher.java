@@ -22,4 +22,27 @@ public class DesktopLauncher implements IActivityRequestHandler {
 	@Override
 	public void showAds(boolean show) {
 	}
+
+	@Override
+	public boolean isSignedIn() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public void beginUserSignIn() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void signOutUser() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void rateApp() {
+		// TODO Auto-generated method stub
+		
+	}
 }
