@@ -180,7 +180,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
 	// Should we start the flow to sign the user in automatically on startup? If
 	// so, up to
 	// how many times in the life of the application?
-	static final int DEFAULT_MAX_SIGN_IN_ATTEMPTS = 1;
+	static final int DEFAULT_MAX_SIGN_IN_ATTEMPTS = 3;
 	int mMaxAutoSignInAttempts = DEFAULT_MAX_SIGN_IN_ATTEMPTS;
 
 	/**
@@ -407,7 +407,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
 			debugLog("Client already disconnected when we got onStop.");
 		}
 		mConnecting = false;
-		mExpectingResolution = false;
+		// mExpectingResolution = false;
 
 		// let go of the Activity reference
 		mActivity = null;

@@ -27,6 +27,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public Screen mainMenuScreen, helpScreen, endScreen;
 	public Texture bg0, tex_escargot;
 	public IActivityRequestHandler myRequestHandler;
+	public boolean achievementList[] = { false, false, false, false, false };
 
 	public EscargotGame(IActivityRequestHandler handler) {
 		myRequestHandler = handler;
@@ -36,7 +37,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public void create() {
 		batch = new SpriteBatch();
 		// Use LibGDX's default Arial font.
-		font = new BitmapFont(Gdx.files.internal("magneto2.fnt"));
+		font = new BitmapFont(Gdx.files.internal("magneto3.fnt"));
 		// font = new BitmapFont();
 		sr = new ShapeRenderer();
 		if (score_player == null)
@@ -52,6 +53,9 @@ public class EscargotGame extends Game implements ApplicationListener {
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		son_on = prefs.getBoolean("son_on", true);
 		vibre_on = prefs.getBoolean("vibre_on", true);
+		for (int i = 0; i < achievementList.length; i++) {
+			achievementList[i] = prefs.getBoolean("a0", false);
+		}
 		score_player.resetScore();
 		score_player.setScore(prefs.getFloat("max_score", 0.0f));
 		score_player.resetScore();
@@ -79,6 +83,9 @@ public class EscargotGame extends Game implements ApplicationListener {
 		score_player.updateBestScore();
 		prefs.putFloat("max_score", score_player.getMaxScoreValue());
 		prefs.flush();
+		mainMenuScreen.dispose();
+		helpScreen.dispose();
+		endScreen.dispose();
 		bg0.dispose();
 		tex_escargot.dispose();
 	}

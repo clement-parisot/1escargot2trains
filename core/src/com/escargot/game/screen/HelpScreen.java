@@ -5,20 +5,46 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotGame;
 
 public class HelpScreen implements Screen {
 
 	final EscargotGame game;
 	private OrthographicCamera camera;
-	private Texture retour;
+	private Button retour;
+	private Stage stage;
+	private Skin skin;
+	private HorizontalGroup table;
 
-	public HelpScreen(EscargotGame game) {
+	public HelpScreen(final EscargotGame game) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 640, 480);
-		retour = new Texture(Gdx.files.internal("back.png"));
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		table = new HorizontalGroup();
+		table.setFillParent(true);
+		stage.addActor(table);
+		skin = new Skin();
+		skin.add("retour", new Texture(Gdx.files.internal("back.png")));
+		retour = new Button(skin.getDrawable("retour"));
+		retour.addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.setScreen(game.mainMenuScreen);
+			}
+		});
+		table.addActor(retour);
+		table.bottom();
+		game.myRequestHandler.showAds(true);
 	}
 
 	@Override
@@ -31,10 +57,12 @@ public class HelpScreen implements Screen {
 
 		game.batch.begin();
 		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
-		game.font.drawWrapped(game.batch, game.help, 20, 350, 620);
 		game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
-		game.batch.draw(retour, 0, 0, 64, 64);
+		game.font.drawWrapped(game.batch, game.help, 20, 350, 620);
 		game.batch.end();
+
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
 
 		if (Gdx.input.justTouched()) {
 			game.setScreen(game.mainMenuScreen);
@@ -43,6 +71,7 @@ public class HelpScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
+		stage.getViewport().update(width, height, true);
 	}
 
 	@Override
@@ -65,7 +94,8 @@ public class HelpScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		retour.dispose();
+		stage.dispose();
+		skin.dispose();
 	}
 
 }

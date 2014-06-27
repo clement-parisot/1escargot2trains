@@ -6,6 +6,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Score;
 
@@ -13,20 +20,46 @@ public class EndScreen implements Screen {
 
 	final EscargotGame game;
 	private OrthographicCamera camera;
-	private Texture retour, noter;
+	private Button retour, noter;
+	private Stage stage;
+	private Skin skin;
+	private HorizontalGroup table;
 
 	public EndScreen(final EscargotGame game, final Score score) {
 		this.game = game;
-
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 640, 480);
-		retour = new Texture(Gdx.files.internal("back.png"));
-		noter = new Texture(Gdx.files.internal("star.png"));
-		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
-		prefs.putBoolean("son_on", EscargotGame.son_on);
-		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
-		prefs.putFloat("max_score", score.getMaxScoreValue());
-		prefs.flush();
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		table = new HorizontalGroup();
+		table.setFillParent(true);
+		stage.addActor(table);
+		skin = new Skin();
+		skin.add("retour", new Texture(Gdx.files.internal("back.png")));
+		skin.add("noter", new Texture(Gdx.files.internal("star.png")));
+
+		retour = new Button(skin.getDrawable("retour"));
+		retour.addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.setScreen(game.mainMenuScreen);
+			}
+		});
+
+		noter = new Button(skin.getDrawable("noter"));
+		noter.addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.myRequestHandler.rateApp();
+			}
+		});
+		table.addActor(retour);
+		table.addActor(noter);
+
+		table.bottom();
+		game.myRequestHandler.showAds(true);
 	}
 
 	@Override
@@ -45,31 +78,62 @@ public class EndScreen implements Screen {
 		game.font.draw(game.batch,
 				game.bestscore_txt + game.score_player.getMaxScore(), 200, 275);
 		game.batch.draw(game.tex_escargot, 200, 20, 312, 198);
-		game.batch.draw(retour, 0, 0, 64, 64);
-		game.batch.draw(noter, 576, 0, 64, 64);
 		game.batch.end();
 
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
+
 		if (Gdx.input.justTouched()) {
-			if (Gdx.input.getX() < 64
-					&& Gdx.input.getY() > Gdx.graphics.getHeight() - 64) {
-				game.setScreen(game.mainMenuScreen);
-			} else if (Gdx.input.getX() > Gdx.graphics.getWidth() - 64
-					&& Gdx.input.getY() > Gdx.graphics.getHeight() - 64) {
-				// aide
-				game.myRequestHandler.rateApp();
-			} else {
+			Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),
+					0);
+			camera.unproject(touchPos);
+			if (touchPos.y > 70)
 				game.setScreen(new GameScreen(game));
-			}
 		}
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		stage.getViewport().update(width, height, true);
 	}
 
 	@Override
 	public void show() {
 		game.myRequestHandler.showAds(true);
+		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+		prefs.putBoolean("son_on", EscargotGame.son_on);
+		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
+		prefs.putFloat("max_score", game.score_player.getMaxScoreValue());
+		prefs.flush();
+		int score = game.score_player.getScore();
+		game.myRequestHandler.envoyerScore(score);
+		if (score >= 500 && !game.achievementList[0]) {
+			game.myRequestHandler.unlock(0);
+			game.achievementList[0] = true;
+			prefs.putBoolean("a0", true);
+		}
+		if (score >= 1000 && !game.achievementList[1]) {
+			game.myRequestHandler.unlock(1);
+			game.achievementList[1] = true;
+			prefs.putBoolean("a1", true);
+		}
+		if (score >= 2000 && !game.achievementList[2]) {
+			game.myRequestHandler.unlock(2);
+			game.achievementList[2] = true;
+			prefs.putBoolean("a2", true);
+		}
+		if (score >= 3000 && !game.achievementList[3]) {
+			game.myRequestHandler.unlock(3);
+			game.achievementList[3] = true;
+			prefs.putBoolean("a3", true);
+		}
+		if (score >= 4000 && !game.achievementList[4]) {
+			game.myRequestHandler.unlock(4);
+			game.achievementList[4] = true;
+			prefs.putBoolean("a4", true);
+		}
+		prefs.flush();
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
@@ -87,8 +151,8 @@ public class EndScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		retour.dispose();
-		noter.dispose();
+		stage.dispose();
+		skin.dispose();
 	}
 
 }

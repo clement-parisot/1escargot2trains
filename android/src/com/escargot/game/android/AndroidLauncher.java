@@ -2,22 +2,21 @@ package com.escargot.game.android;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 
-import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.escargot.game.SigningResolver;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.IActivityRequestHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameActivity;
 
 public class AndroidLauncher extends BaseGameActivity implements
@@ -25,11 +24,14 @@ public class AndroidLauncher extends BaseGameActivity implements
 
 	protected AdView adView;
 
-	private final static String TAG = "AndroidLauncher";
+	private static final int REQUEST_ACHIEVEMENTS = 42;
+
+	private static final int REQUEST_LEADERBOARD = 1337;
 
 	private final int SHOW_ADS = 1;
 	private final int HIDE_ADS = 0;
 	private final int RATE_APP = 2;
+	@SuppressWarnings("unused")
 	private boolean signInSuccess = false;
 
 	@SuppressLint("HandlerLeak")
@@ -45,7 +47,7 @@ public class AndroidLauncher extends BaseGameActivity implements
 				adView.setVisibility(View.GONE);
 				break;
 			}
-			case RATE_APP:{
+			case RATE_APP: {
 				AppRater.showRateDialog(adView.getContext());
 			}
 			}
@@ -56,6 +58,8 @@ public class AndroidLauncher extends BaseGameActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		config.useAccelerometer = false;
+		config.useCompass = false;
 		RelativeLayout layout = new RelativeLayout(this);
 		View gameView = initializeForView(new EscargotGame(this), config);
 		adView = new AdView(this);
@@ -122,12 +126,20 @@ public class AndroidLauncher extends BaseGameActivity implements
 	public void onSignInFailed() {
 		System.out.println("anotherday...");
 		this.signInSuccess = false;
+		SharedPreferences prefs = this.getSharedPreferences("ggame", 0);
+		final SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean("anotherday", true);
+		editor.commit();
 	}
 
 	@Override
 	public void onSignInSucceeded() {
 		System.out.println("success");
 		this.signInSuccess = true;
+		SharedPreferences prefs = this.getSharedPreferences("ggame", 0);
+		final SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean("anotherday", false);
+		editor.commit();
 	}
 
 	@Override
@@ -143,10 +155,76 @@ public class AndroidLauncher extends BaseGameActivity implements
 	@Override
 	public void signOutUser() {
 		this.signOut();
+		SharedPreferences prefs = this.getSharedPreferences("ggame", 0);
+		final SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean("anotherday", true);
+		editor.commit();
 	}
 
 	@Override
 	public void rateApp() {
 		handler.sendEmptyMessage(RATE_APP);
 	}
+
+	@Override
+	public void unlock(int id) {
+		if (isConnected()) {
+			switch (id) {
+			case 0:
+				Games.Achievements.unlock(getApiClient(),
+						getString(R.string.achievement_500_points));
+				break;
+			case 1:
+				Games.Achievements.unlock(getApiClient(),
+						getString(R.string.achievement_1000_points));
+				break;
+			case 2:
+				Games.Achievements.unlock(getApiClient(),
+						getString(R.string.achievement_2000_points));
+				break;
+			case 3:
+				Games.Achievements.unlock(getApiClient(),
+						getString(R.string.achievement_3000_points));
+				break;
+			case 4:
+				Games.Achievements.unlock(getApiClient(),
+						getString(R.string.achievement_4000_points));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	@Override
+	public boolean isConnected() {
+		return isSignedIn() && mHelper.getApiClient().isConnected();
+	}
+
+	@Override
+	public void showAchievments() {
+		if (isConnected()) {
+		startActivityForResult(
+				Games.Achievements.getAchievementsIntent(getApiClient()),
+				REQUEST_ACHIEVEMENTS);
+		}
+	}
+
+	@Override
+	public void envoyerScore(int score) {
+		if (isConnected()){
+			Games.Leaderboards.submitScore(getApiClient(),
+				getString(R.string.leaderboard_highscores), score);
+		}
+	}
+
+	@Override
+	public void classement() {
+		if (isConnected()) {
+		startActivityForResult(Games.Leaderboards.getLeaderboardIntent(
+				getApiClient(), getString(R.string.leaderboard_highscores)),
+				REQUEST_LEADERBOARD);
+		}
+	}
+
 }

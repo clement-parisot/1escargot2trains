@@ -50,6 +50,7 @@ public class GameScreen implements Screen {
 	ParticleEffectPool fumeePool, mortPool;
 	Array<PooledEffect> effects;
 
+	@SuppressWarnings("unused")
 	private boolean faster = false;
 	private ParticleEffect mort;
 	private boolean end = false;
@@ -89,7 +90,7 @@ public class GameScreen implements Screen {
 		InputMultiplexer im = new InputMultiplexer();
 		MyInputProcessorKey inputProcessorKey = new MyInputProcessorKey();
 		MyInputProcessorTouch inputProcessorTouch = new MyInputProcessorTouch();
-		im.addProcessor(new GestureDetector(inputProcessorTouch));
+		im.addProcessor(new GestureDetector(20.0f,0.4f,0.3f,0.15f, inputProcessorTouch));
 		im.addProcessor(inputProcessorKey);
 		Gdx.input.setInputProcessor(im);
 
@@ -107,6 +108,7 @@ public class GameScreen implements Screen {
 		PooledEffect effect2 = fumeePool.obtain();
 		effect2.setPosition(obj_trainD.x, 240);
 		effects.add(effect2);
+		game.myRequestHandler.showAds(false);
 	}
 
 	public class MyInputProcessorKey implements InputProcessor {
@@ -115,14 +117,14 @@ public class GameScreen implements Screen {
 		public boolean keyDown(int keycode) {
 			if (keycode == Keys.LEFT) {
 				faster = true;
-				obj_escargot.vitesse = 120;
+				obj_escargot.vitesse = 40;
 				obj_escargot.flip(0);
 				;
 				return true;
 			}
 			if (keycode == Keys.RIGHT) {
 				faster = true;
-				obj_escargot.vitesse = 120;
+				obj_escargot.vitesse = 40;
 				obj_escargot.flip(640);
 				;
 				return true;
@@ -284,7 +286,7 @@ public class GameScreen implements Screen {
 	}
 
 	private void end_game() {
-		game.score_player= score_game;
+		game.score_player = score_game;
 		game.setScreen(game.endScreen);
 		dispose();
 	}

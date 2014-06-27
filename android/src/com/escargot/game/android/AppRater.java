@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 
 public class AppRater {
-	private final static String APP_TITLE = "1 Escargot 2 Trains";// App Name
 	private final static String APP_PNAME = "com.escargot.game.android";// Package
 																		// Name
 
@@ -86,7 +85,7 @@ public class AppRater {
 		});
 		dialog.create().show();
 	}
-	
+
 	public static void showRateDialog(final Context mContext) {
 		SharedPreferences prefs = mContext.getSharedPreferences("apprater", 0);
 		final SharedPreferences.Editor editor = prefs.edit();

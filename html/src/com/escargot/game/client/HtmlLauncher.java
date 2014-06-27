@@ -20,4 +20,58 @@ public class HtmlLauncher extends GwtApplication implements IActivityRequestHand
 		@Override
 		public void showAds(boolean show) {
 		}
+
+		@Override
+		public boolean isSignedIn() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void beginUserSignIn() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void signOutUser() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void rateApp() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void unlock(int id) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean isConnected() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void showAchievments() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void envoyerScore(int score) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void classement() {
+			// TODO Auto-generated method stub
+			
+		}
 }

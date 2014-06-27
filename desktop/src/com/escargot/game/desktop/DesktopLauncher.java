@@ -31,18 +31,41 @@ public class DesktopLauncher implements IActivityRequestHandler {
 
 	@Override
 	public void beginUserSignIn() {
-		// TODO Auto-generated method stub
+		System.out.println("Signin...");
 	}
 
 	@Override
 	public void signOutUser() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Signout");
 	}
 
 	@Override
 	public void rateApp() {
-		// TODO Auto-generated method stub
+		System.out.println("rate");
+	}
+
+	@Override
+	public void unlock(int id) {
 		
+	}
+
+	@Override
+	public boolean isConnected() {
+		return true;
+	}
+
+	@Override
+	public void showAchievments() {
+		System.out.println("achiev");
+	}
+
+	@Override
+	public void envoyerScore(int score) {
+		
+	}
+
+	@Override
+	public void classement() {
+		System.out.println("classement");
 	}
 }
