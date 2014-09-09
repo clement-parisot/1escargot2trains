@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.Score;
 
 public class MainMenuScreen implements Screen {
 	final EscargotGame game;
@@ -138,7 +139,7 @@ public class MainMenuScreen implements Screen {
 				if (prefs.getBoolean("firstGame", true)) {
 					prefs.putBoolean("firstGame", false);
 					prefs.flush();
-					game.setScreen(new TutorialScreen(game));
+					game.setScreen(new TutorialScreen(game, new Score()));
 				} else {
 					game.setScreen(new GameScreen(game));
 				}
