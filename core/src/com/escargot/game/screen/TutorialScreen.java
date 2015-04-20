@@ -77,7 +77,7 @@ public class TutorialScreen implements Screen {
 				.draw(game.batch, game.score_txt + game.score_player, 200, 300);
 		game.font.draw(game.batch,
 				game.bestscore_txt + game.score_player.getMaxScore(), 200, 275);
-		game.batch.draw(game.tex_escargot, 200, 20, 312, 198);
+		//game.batch.draw(game.tex_escargot, 200, 20, 312, 198);
 		game.batch.end();
 
 		stage.act(Gdx.graphics.getDeltaTime());

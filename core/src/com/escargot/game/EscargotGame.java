@@ -25,7 +25,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public String mainscreen1, mainscreen2, help, gameover, score_txt,
 			bestscore_txt;
 	public Screen mainMenuScreen, helpScreen, endScreen;
-	public Texture bg0, tex_escargot;
+	public Texture bg0;
 	public IActivityRequestHandler myRequestHandler;
 	public boolean achievementList[] = { false, false, false, false, false };
 
@@ -60,7 +60,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 		score_player.setScore(prefs.getFloat("max_score", 0.0f));
 		score_player.resetScore();
 		bg0 = new Texture(Gdx.files.internal("background_0.jpg"));
-		tex_escargot = new Texture(Gdx.files.internal("escargot_0.png"));
+		
 		mainMenuScreen = new MainMenuScreen(this);
 		helpScreen = new HelpScreen(this);
 		endScreen = new EndScreen(this, score_player);
@@ -87,6 +87,5 @@ public class EscargotGame extends Game implements ApplicationListener {
 		helpScreen.dispose();
 		endScreen.dispose();
 		bg0.dispose();
-		tex_escargot.dispose();
 	}
 }

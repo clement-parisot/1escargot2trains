@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.Array;
 import com.escargot.game.AbstractGameObject;
 import com.escargot.game.Escargot;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.Fumee;
 import com.escargot.game.Score;
 import com.escargot.game.Train;
 
@@ -72,14 +73,10 @@ public class GameScreen implements Screen {
 		cam2 = new OrthographicCamera();
 		cam2.setToOrtho(false, 640, 480);
 
-		// Textures
-		tex_train = new Texture(Gdx.files.internal("train_0.png"));
-
 		// Objets
-		obj_escargot = new Escargot(1920 / 2 - 32 / 2, 20, 32, 20,
-				game.tex_escargot, 40);
-		obj_trainG = new Train(-355, 20, 355, 128, tex_train, -1, 20);
-		obj_trainD = new Train(1920, 20, 355, 128, tex_train, 1, 20);
+		obj_escargot = new Escargot(0, 20, 0.16f, 40);
+		obj_trainG = new Train(-626, 20, 1f, -1, 20);
+		obj_trainD = new Train(1920, 20, 1f, 1, 20);
 
 		// Groupes de collision
 		listeTrains = new ArrayList<AbstractGameObject>();
@@ -95,8 +92,7 @@ public class GameScreen implements Screen {
 		Gdx.input.setInputProcessor(im);
 
 		effects = new Array<PooledEffect>();
-		fumee = new ParticleEffect();
-		fumee.load(Gdx.files.internal("fumee_train"), Gdx.files.internal(""));
+		fumee = new Fumee();
 		mort = new ParticleEffect();
 		mort.load(Gdx.files.internal("escargot"), Gdx.files.internal(""));
 		mortPool = new ParticleEffectPool(mort, 1, 2);
@@ -225,8 +221,15 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		float dist = Math.min(Math.abs(obj_escargot.x - obj_trainG.x - 355),
-				Math.abs(obj_trainD.x - obj_escargot.x - 32));
+		Vector2 posEscargot = new Vector2(),
+                posTrainG = new Vector2(),
+		        posTrainD = new Vector2();
+		obj_escargot.getCenter(posEscargot);
+		obj_trainG.getCenter(posTrainG);
+		obj_trainD.getCenter(posTrainD);
+		float distg = posEscargot.x - posTrainG.x;
+		float distd = posTrainD.x - posEscargot.x;
+		float dist = Math.min(Math.abs(distg), Math.abs(distd));
 		if (!end) {
 			move(delta);
 			score_update(dist, delta);
@@ -235,7 +238,7 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		camera_zoom(dist);
+		camera_zoom(dist, posEscargot);
 		camera.update();
 		cam2.update();
 
@@ -246,6 +249,7 @@ public class GameScreen implements Screen {
 		if (!end) {
 			obj_escargot.draw(game.batch);
 		}
+		
 		obj_trainG.draw(game.batch);
 		obj_trainD.draw(game.batch);
 		// Update and draw effects:
@@ -266,10 +270,13 @@ public class GameScreen implements Screen {
 		game.batch.end();
 		game.sr.begin(ShapeType.Filled);
 		game.sr.setProjectionMatrix(cam2.combined);
-		game.sr.setColor(Math.max(0.0f, 1.0f - dist / 925.0f),
-				Math.min(dist / 925.0f, 1.0f), 0.1f, 1);
+		game.sr.setColor(Math.max(0.0f, 1.0f - dist / 1272.0f),
+				Math.min(dist / 1272.0f, 1.0f), 0.1f, 1);
 		game.sr.rect(288, 170, dist / 8, 20);
-
+		game.sr.setProjectionMatrix(camera.combined);
+		game.sr.circle(posEscargot.x, posEscargot.y, 3.0f);
+		game.sr.circle(posTrainD.x, posTrainD.y, 3.0f);
+		game.sr.circle(posTrainG.x, posTrainG.y, 3.0f);
 		game.sr.end();
 		if (!end) {
 			if (collision(obj_escargot, listeTrains)) {
@@ -300,14 +307,14 @@ public class GameScreen implements Screen {
 		score_game.setScore(pas * 2.0 * delta);
 	}
 
-	private void camera_zoom(float dist) {
-		float pas = dist / 650.0f;
-		zoom_factor = Math.max(0.2f, Math.min(pas, 1.0f));
+	private void camera_zoom(float dist, Vector2 posEscargot) {
+		float pas = dist / 1200.0f;
+		zoom_factor = Math.max(0.1f, Math.min(pas, 1.0f));
 		camera.viewportHeight = 1200 * zoom_factor;
 		camera.position.y = camera.viewportHeight / 2;
 		camera.viewportWidth = 1920 * zoom_factor;
 		camera.position.x = Math.min(
-				Math.max(obj_escargot.x, camera.viewportWidth / 2),
+				Math.max(posEscargot.x, camera.viewportWidth / 2),
 				1920 - camera.viewportWidth / 2);
 	}
 
@@ -317,20 +324,22 @@ public class GameScreen implements Screen {
 		sound_train.dispose();
 		sound_mort.dispose();
 
-		tex_train.dispose();
 		for (int i = effects.size - 1; i >= 0; i--)
 			effects.get(i).free();
 		effects.clear();
 		mort.dispose();
 
 		fumee.dispose();
+		obj_escargot.dispose();
+		obj_trainG.dispose();
+		obj_trainD.dispose();
 	}
 
 	private void move(float delta) {
 		obj_trainG.x += 20 * delta;
 		obj_trainD.x -= 20 * delta;
-		effects.get(0).setPosition(obj_trainG.x + 320, 145);
-		effects.get(1).setPosition(obj_trainD.x + 35, 145);
+		effects.get(0).setPosition(obj_trainG.getFumX(), obj_trainG.getFumY());
+		effects.get(1).setPosition(obj_trainD.getFumX(), obj_trainD.getFumY());
 		obj_escargot.x -= obj_escargot.getDirection() * obj_escargot.vitesse
 				* delta;
 	}
@@ -362,6 +371,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void hide() {
 		game.myRequestHandler.showAds(true);
+		game.myRequestHandler.show_inter_ads();
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package com.escargot.game;
 
 public interface IActivityRequestHandler {
 	public void showAds(boolean show);
+	
+	public void show_inter_ads();
 
 	public boolean isSignedIn();
 

@@ -44,4 +44,8 @@ public abstract class AbstractGameObject extends Rectangle {
 	public void setDirection(int direction) {
 		this.direction = direction;
 	}
+	
+	public void dispose(){
+		this.texture.dispose();
+	}
 }

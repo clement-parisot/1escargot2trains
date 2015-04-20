@@ -68,4 +68,9 @@ public class DesktopLauncher implements IActivityRequestHandler {
 	public void classement() {
 		System.out.println("classement");
 	}
+
+	@Override
+	public void show_inter_ads() {
+		
+	}
 }

@@ -74,4 +74,10 @@ public class HtmlLauncher extends GwtApplication implements IActivityRequestHand
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void show_inter_ads() {
+			// TODO Auto-generated method stub
+			
+		}
 }

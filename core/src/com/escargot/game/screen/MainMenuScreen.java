@@ -1,4 +1,4 @@
-package com.escargot.game.screen;
+ package com.escargot.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -36,7 +36,7 @@ public class MainMenuScreen implements Screen {
 		stage = new Stage();
 		table = new HorizontalGroup();
 		table.setFillParent(true);
-		table.align(Align.bottom + Align.right);
+		table.align(Align.bottom);
 		stage.addActor(table);
 
 		skin = new Skin();
@@ -122,7 +122,7 @@ public class MainMenuScreen implements Screen {
 				HAlignment.CENTER);
 		game.font.drawWrapped(game.batch, game.mainscreen2, 120, 250, 400,
 				HAlignment.CENTER);
-		game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
+		//game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
 		game.batch.end();
 		but_son_on.setVisible(EscargotGame.son_on);
 		but_son_off.setVisible(!EscargotGame.son_on);
