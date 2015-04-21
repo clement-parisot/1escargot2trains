@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.escargot.game.EscargotGame;
 
 public class HelpScreen implements Screen {
@@ -58,7 +59,7 @@ public class HelpScreen implements Screen {
 		game.batch.begin();
 		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
 		//game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
-		game.font.drawWrapped(game.batch, game.help, 20, 350, 620);
+		game.font.draw(game.batch, game.help, 20, 350, 620, Align.center, true);
 		game.batch.end();
 
 		stage.act(Gdx.graphics.getDeltaTime());

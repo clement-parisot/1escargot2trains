@@ -5,13 +5,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.HAlignment;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.escargot.game.EscargotGame;
 
 public class ScoreScreen implements Screen {
@@ -110,9 +110,9 @@ public class ScoreScreen implements Screen {
 		game.batch.begin();
 		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
 		if (!isSignedIn) {
-			game.font.drawWrapped(game.batch,
+			game.font.draw(game.batch,
 					"Please sign in to Google Play Game", 160, 240, 320,
-					HAlignment.CENTER);
+					Align.center, true);
 			sign_in.setVisible(true);
 			sign_out.setVisible(false);
 		}else{

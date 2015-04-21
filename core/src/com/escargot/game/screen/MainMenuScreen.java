@@ -6,47 +6,57 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.HAlignment;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.escargot.game.EscargotActor;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Score;
 
 public class MainMenuScreen implements Screen {
 	final EscargotGame game;
-	Button but_son_on, but_son_off, but_aide, but_vibre_on, but_vibre_off,
-			but_score;
+	Button but_play, but_score, but_quit;
+	Button but_son_on, but_son_off, but_aide, but_vibre_on, but_vibre_off;
 
 	OrthographicCamera camera;
 	private Stage stage;
 	private Skin skin;
-	private HorizontalGroup table;
+	private HorizontalGroup main_buttons;
 
 	public MainMenuScreen(final EscargotGame game) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 640, 480);
-		stage = new Stage();
-		table = new HorizontalGroup();
-		table.setFillParent(true);
-		table.align(Align.bottom);
-		stage.addActor(table);
+		stage = new Stage(new StretchViewport(640, 480));
+		main_buttons = new HorizontalGroup();
+		main_buttons.align(Align.center);
+		
+		stage.addActor(main_buttons);
 
 		skin = new Skin();
+		// Main buttons
+		skin.add("play", new Texture(Gdx.files.internal("play.png")));
+		skin.add("score", new Texture(Gdx.files.internal("score.png")));
+		skin.add("quit", new Texture(Gdx.files.internal("signOut.png")));
+		
+		// Parameters
+		skin.add("param", new Texture(Gdx.files.internal("param.png")));
 		skin.add("son_on", new Texture(Gdx.files.internal("son_on.png")));
 		skin.add("son_off", new Texture(Gdx.files.internal("son_off.png")));
 		skin.add("vibre_on", new Texture(Gdx.files.internal("vibre_on.png")));
 		skin.add("vibre_off", new Texture(Gdx.files.internal("vibre_off.png")));
-		skin.add("aide", new Texture(Gdx.files.internal("aide.png")));
-		skin.add("score", new Texture(Gdx.files.internal("score.png")));
-
+		
+		// Escargot et Trains
+		skin.add("escargot", new Texture(Gdx.files.internal("escargot_0.png")));
+		skin.add("train", new Texture(Gdx.files.internal("train_0.png")));
+		
 		// Button
 		but_son_on = new Button(skin.getDrawable("son_on"));
 		but_son_on.addListener(new ChangeListener() {
@@ -81,12 +91,12 @@ public class MainMenuScreen implements Screen {
 				Gdx.input.vibrate(1000);
 			}
 		});
-		but_aide = new Button(skin.getDrawable("aide"));
-		but_aide.addListener(new ChangeListener() {
+		but_play = new Button(skin.getDrawable("play"));
+		but_play.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(game.helpScreen);
+				game.setScreen(new GameScreen(game));
 			}
 		});
 		but_score = new Button(skin.getDrawable("score"));
@@ -97,13 +107,22 @@ public class MainMenuScreen implements Screen {
 				game.setScreen(new ScoreScreen(game));
 			}
 		});
+		but_quit = new Button(skin.getDrawable("quit"));
+		but_quit.addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.dispose();
+			}
+		});
 		// Add to stage
-		table.addActor(but_son_on);
-		table.addActor(but_son_off);
-		table.addActor(but_vibre_on);
-		table.addActor(but_vibre_off);
-		table.addActor(but_score);
-		table.addActor(but_aide);
+		main_buttons.addActor(but_score);
+		main_buttons.addActor(but_play);
+		main_buttons.addActor(but_quit);
+		stage.addActor(new EscargotActor());
+
+		main_buttons.pack();
+		main_buttons.setPosition((Gdx.graphics.getWidth() - main_buttons.getMinWidth()) / 2, 0);
 		// Pub
 		game.myRequestHandler.showAds(true);
 	}
@@ -117,11 +136,9 @@ public class MainMenuScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
-		game.font.drawWrapped(game.batch, game.mainscreen1, 120, 300, 400,
-				HAlignment.CENTER);
-		game.font.drawWrapped(game.batch, game.mainscreen2, 120, 250, 400,
-				HAlignment.CENTER);
+		game.batch.draw(game.bg0, 0, 0, 640, 480);
+		game.font.draw(game.batch, game.mainscreen1, 120, 300, 400,	Align.center, true);
+		game.font.draw(game.batch, game.mainscreen2, 120, 250, 400, Align.center, true);
 		//game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
 		game.batch.end();
 		but_son_on.setVisible(EscargotGame.son_on);
