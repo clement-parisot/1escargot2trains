@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -22,12 +23,14 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public Score score_player;
 	public static boolean son_on = true;
 	public static boolean vibre_on = true;
-	public String mainscreen1, mainscreen2, help, gameover, score_txt,
+	public String escargot, trains, help, gameover, score_txt,
 			bestscore_txt;
 	public Screen mainMenuScreen, helpScreen, endScreen;
 	public Texture bg0;
 	public IActivityRequestHandler myRequestHandler;
 	public boolean achievementList[] = { false, false, false, false, false };
+	public BitmapFont fontVanilla;
+	public BitmapFont fontNashville;
 
 	public EscargotGame(IActivityRequestHandler handler) {
 		myRequestHandler = handler;
@@ -38,14 +41,19 @@ public class EscargotGame extends Game implements ApplicationListener {
 		batch = new SpriteBatch();
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont(Gdx.files.internal("magneto3.fnt"));
-		// font = new BitmapFont();
+		font.setColor(Color.WHITE);
+		// Use LibGDX's default Arial font.
+		fontVanilla = new BitmapFont(Gdx.files.internal("vanilla.fnt"));
+		fontVanilla.setColor(Color.WHITE);
+		fontNashville = new BitmapFont(Gdx.files.internal("nashville.fnt"));
+		fontNashville.setColor(Color.WHITE);
 		sr = new ShapeRenderer();
 		if (score_player == null)
 			score_player = new Score();
 		FileHandle baseFileHandle = Gdx.files.internal("i18n/MyBundle");
 		I18NBundle myBundle = I18NBundle.createBundle(baseFileHandle);
-		mainscreen1 = myBundle.get("mainscreen1");
-		mainscreen2 = myBundle.get("mainscreen2");
+		escargot = myBundle.get("snail");
+		trains = myBundle.get("trains");
 		help = myBundle.get("help");
 		gameover = myBundle.get("gameover");
 		score_txt = myBundle.get("score");

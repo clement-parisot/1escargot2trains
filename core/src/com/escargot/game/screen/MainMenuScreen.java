@@ -3,21 +3,34 @@
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotActor;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.Fumee;
+import com.escargot.game.RailActor;
 import com.escargot.game.Score;
+import com.escargot.game.TrainActor;
 
 public class MainMenuScreen implements Screen {
 	final EscargotGame game;
@@ -28,6 +41,14 @@ public class MainMenuScreen implements Screen {
 	private Stage stage;
 	private Skin skin;
 	private HorizontalGroup main_buttons;
+	private EscargotActor escargot;
+	private Array<PooledEffect> effects;
+	private Fumee fumee;
+	private ParticleEffectPool fumeePool;
+	private TrainActor trainG;
+	private TrainActor trainD;
+	private String vanillaString;
+	private String nashString;
 
 	public MainMenuScreen(final EscargotGame game) {
 		this.game = game;
@@ -112,19 +133,69 @@ public class MainMenuScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.dispose();
+				Gdx.app.exit();
 			}
 		});
 		// Add to stage
 		main_buttons.addActor(but_score);
 		main_buttons.addActor(but_play);
 		main_buttons.addActor(but_quit);
-		stage.addActor(new EscargotActor());
+		
+		escargot = new EscargotActor(320, 140, 0.16f, 0);
+		escargot.addAction(Actions.forever(Actions.sequence(
+				Actions.moveToAligned(200.0f,140.0f,Align.bottomLeft,1.0f,Interpolation.sine),
+                Actions.scaleTo(-1.0f, 1.0f),
+				Actions.moveToAligned(440.0f,140.0f,Align.bottomRight,1.0f,Interpolation.sine), 
+				Actions.scaleTo(1.0f, 1.0f))));
+		stage.addActor(escargot);
+		trainG = new TrainActor(200,140,0.5f,-1,0);
+		stage.addActor(trainG);
+		trainD = new TrainActor(440,140,0.5f,1,0);
+		stage.addActor(trainD);
+		RailActor rails = new RailActor();
+		stage.addActor(rails);
+		stage.act(1);
+		
+		effects = new Array<PooledEffect>();
+		fumee = new Fumee();
+		fumeePool = new ParticleEffectPool(fumee, 1, 2);
+		PooledEffect effect = fumeePool.obtain();
+		effect.setPosition(trainG.getFumX(), trainG.getFumY());
+		effects.add(effect);
+		PooledEffect effect2 = fumeePool.obtain();
+		effect2.setPosition(trainD.getFumX(), trainD.getFumY());
+		effects.add(effect2);
 
 		main_buttons.pack();
-		main_buttons.setPosition((Gdx.graphics.getWidth() - main_buttons.getMinWidth()) / 2, 0);
+		main_buttons.setPosition(320, 0, Align.bottom+Align.center);
 		// Pub
 		game.myRequestHandler.showAds(true);
+		Table t = new Table();
+		
+		t.defaults().pad(10);
+		stage.addActor(t);
+		//t.setFillParent(true);
+		LabelStyle vanillaStyle = new LabelStyle(game.fontVanilla, Color.WHITE);
+		LabelStyle nashStyle = new LabelStyle(game.fontNashville, Color.WHITE);
+		Container<Label> lab_1 = new Container<Label>(new Label("1", vanillaStyle));
+		Container<Label> lab_2 = new Container<Label>(new Label("2", vanillaStyle));
+		Container<Label> lab_escargot = new Container<Label>(new Label(game.escargot, nashStyle));
+		Container<Label> lab_trains = new Container<Label>(new Label(game.trains, nashStyle));
+		lab_1.setTransform(true);
+		lab_1.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
+		lab_escargot.setTransform(true);
+		lab_escargot.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.delay(0.5f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
+		lab_2.setTransform(true);
+		lab_2.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.delay(1f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
+		lab_trains.setTransform(true);
+		lab_trains.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.delay(1.5f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
+        t.add(lab_1);
+		t.add(lab_escargot);
+		//t.row();
+		t.add(lab_2);
+		t.add(lab_trains);
+		t.pack();
+		t.setPosition(320, 420, Align.top+Align.center);
 	}
 
 	@Override
@@ -137,9 +208,12 @@ public class MainMenuScreen implements Screen {
 
 		game.batch.begin();
 		game.batch.draw(game.bg0, 0, 0, 640, 480);
-		game.font.draw(game.batch, game.mainscreen1, 120, 300, 400,	Align.center, true);
-		game.font.draw(game.batch, game.mainscreen2, 120, 250, 400, Align.center, true);
-		//game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
+		// Update and draw effects:
+		for (int i = effects.size - 1; i >= 0; i--) {
+			PooledEffect effect = effects.get(i);
+			effect.draw(game.batch, delta);
+		}
+
 		game.batch.end();
 		but_son_on.setVisible(EscargotGame.son_on);
 		but_son_off.setVisible(!EscargotGame.son_on);
@@ -147,6 +221,7 @@ public class MainMenuScreen implements Screen {
 		but_vibre_off.setVisible(!EscargotGame.vibre_on);
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
+
 		if (Gdx.input.justTouched()) {
 			Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),
 					0);
