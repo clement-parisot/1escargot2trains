@@ -63,20 +63,21 @@ public class MainMenuScreen implements Screen {
 
 		skin = new Skin();
 		// Main buttons
-		skin.add("play", new Texture(Gdx.files.internal("play.png")));
-		skin.add("score", new Texture(Gdx.files.internal("score.png")));
-		skin.add("quit", new Texture(Gdx.files.internal("signOut.png")));
+		skin.add("play", game.atlas.createSprite("play"));
+		skin.add("score", game.atlas.createSprite("score"));
+		skin.add("quit", game.atlas.createSprite("signOut"));
 		
 		// Parameters
-		skin.add("param", new Texture(Gdx.files.internal("param.png")));
-		skin.add("son_on", new Texture(Gdx.files.internal("son_on.png")));
-		skin.add("son_off", new Texture(Gdx.files.internal("son_off.png")));
-		skin.add("vibre_on", new Texture(Gdx.files.internal("vibre_on.png")));
-		skin.add("vibre_off", new Texture(Gdx.files.internal("vibre_off.png")));
+		skin.add("param", game.atlas.createSprite("param"));
+		skin.add("son_on", game.atlas.createSprite("son_on"));
+		skin.add("son_off", game.atlas.createSprite("son_off"));
+		skin.add("vibre_on", game.atlas.createSprite("vibre_on"));
+		skin.add("vibre_off", game.atlas.createSprite("vibre_off"));
 		
 		// Escargot et Trains
-		skin.add("escargot", new Texture(Gdx.files.internal("escargot_0.png")));
-		skin.add("train", new Texture(Gdx.files.internal("train_0.png")));
+		skin.add("escargot", game.atlas.createSprite("escargot"));
+		skin.add("train", game.atlas.createSprite("train"));
+		skin.add("rails", game.atlas.createSprite("rails"));
 		
 		// Button
 		but_son_on = new Button(skin.getDrawable("son_on"));
@@ -142,6 +143,7 @@ public class MainMenuScreen implements Screen {
 		main_buttons.addActor(but_quit);
 		
 		escargot = new EscargotActor(320, 140, 0.16f, 0);
+		escargot.setTexture(skin.getSprite("escargot"));
 		escargot.addAction(Actions.forever(Actions.sequence(
 				Actions.moveToAligned(200.0f,140.0f,Align.bottomLeft,1.0f,Interpolation.sine),
                 Actions.scaleTo(-1.0f, 1.0f),
@@ -149,15 +151,18 @@ public class MainMenuScreen implements Screen {
 				Actions.scaleTo(1.0f, 1.0f))));
 		stage.addActor(escargot);
 		trainG = new TrainActor(200,140,0.5f,-1,0);
+		trainG.setTexture(skin.getSprite("train"));
 		stage.addActor(trainG);
 		trainD = new TrainActor(440,140,0.5f,1,0);
+		trainD.setTexture(skin.getSprite("train"));
 		stage.addActor(trainD);
 		RailActor rails = new RailActor();
+		rails.setTexture(skin.getSprite("rails"));
 		stage.addActor(rails);
 		stage.act(1);
 		
 		effects = new Array<PooledEffect>();
-		fumee = new Fumee();
+		fumee = new Fumee(game);
 		fumeePool = new ParticleEffectPool(fumee, 1, 2);
 		PooledEffect effect = fumeePool.obtain();
 		effect.setPosition(trainG.getFumX(), trainG.getFumY());

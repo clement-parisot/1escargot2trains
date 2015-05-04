@@ -1,30 +1,29 @@
 package com.escargot.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.*;
-import com.badlogic.gdx.utils.Align;
 
 public class TrainActor extends Actor {
 	TextureRegion texture;
+	public void setTexture(TextureRegion texture) {
+		this.texture = texture;
+	}
+
 	private float scale = 1.0f;
 	private int direction = 1;
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 3892860159269540367L;
 	private static int w = 626;
 	private static int h = 141;
 	private static Vector2 fumee = new Vector2(76, 140);
 	private static int fum_x = 76;
 	private static int fum_y = 140;
-	private static String tex_train = "train_0.png";
 	
 	public TrainActor() {
-		texture = new TextureRegion(new Texture(Gdx.files.internal(tex_train)));
 		setWidth(w); setHeight(h);setPosition(200, 140);
 	}
 	

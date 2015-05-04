@@ -34,7 +34,7 @@ public class HelpScreen implements Screen {
 		table.setFillParent(true);
 		stage.addActor(table);
 		skin = new Skin();
-		skin.add("retour", new Texture(Gdx.files.internal("back.png")));
+		skin.add("retour", game.atlas.createSprite("back"));
 		retour = new Button(skin.getDrawable("retour"));
 		retour.addListener(new ChangeListener() {
 

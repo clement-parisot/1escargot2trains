@@ -35,8 +35,8 @@ public class EndScreen implements Screen {
 		table.setFillParent(true);
 		stage.addActor(table);
 		skin = new Skin();
-		skin.add("retour", new Texture(Gdx.files.internal("back.png")));
-		skin.add("noter", new Texture(Gdx.files.internal("star.png")));
+		skin.add("retour", game.atlas.createSprite("back"));
+		skin.add("noter", game.atlas.createSprite("star"));
 
 		retour = new Button(skin.getDrawable("retour"));
 		retour.addListener(new ChangeListener() {

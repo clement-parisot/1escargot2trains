@@ -78,7 +78,7 @@ public class AndroidLauncher extends BaseGameActivity implements
 		adView.setAdSize(AdSize.SMART_BANNER);
 		mInterstitialAd = new InterstitialAd(this);
 		mInterstitialAd.setAdUnitId("***REMOVED***");
-		// Initiez une demande générique.
+		// Initiez une demande generique.
 		requestNewAd();
 		layout.addView(gameView);
 		RelativeLayout.LayoutParams adParams = new RelativeLayout.LayoutParams(
@@ -97,7 +97,7 @@ public class AndroidLauncher extends BaseGameActivity implements
 	}
 	
     private void requestNewAd() {
-    	// Initiez une demande générique.
+    	// Initiez une demande generique.
 		final String id1 = "***REMOVED***";
 		final String id2 = "***REMOVED***";
 		final String id3 = "***REMOVED***";

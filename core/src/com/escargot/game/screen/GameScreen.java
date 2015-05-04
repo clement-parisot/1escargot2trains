@@ -92,7 +92,7 @@ public class GameScreen implements Screen {
 		Gdx.input.setInputProcessor(im);
 
 		effects = new Array<PooledEffect>();
-		fumee = new Fumee();
+		fumee = new Fumee(game);
 		mort = new ParticleEffect();
 		mort.load(Gdx.files.internal("escargot"), Gdx.files.internal(""));
 		mortPool = new ParticleEffectPool(mort, 1, 2);

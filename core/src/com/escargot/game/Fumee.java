@@ -7,7 +7,7 @@ public class Fumee extends ParticleEffect{
 
 	private static String effect_fumee = "fumee_train";
 	
-	public Fumee(){
-		this.load(Gdx.files.internal(effect_fumee), Gdx.files.internal(""));
+	public Fumee(EscargotGame game){
+		this.load(Gdx.files.internal(effect_fumee), game.atlas);
 	}
 }

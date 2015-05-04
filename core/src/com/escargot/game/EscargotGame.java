@@ -5,16 +5,18 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.escargot.game.screen.EndScreen;
 import com.escargot.game.screen.HelpScreen;
-import com.escargot.game.screen.MainMenuScreen;
+import com.escargot.game.screen.LoadingScreen;
 
 public class EscargotGame extends Game implements ApplicationListener {
 	public SpriteBatch batch;
@@ -31,6 +33,8 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public boolean achievementList[] = { false, false, false, false, false };
 	public BitmapFont fontVanilla;
 	public BitmapFont fontNashville;
+	public TextureAtlas atlas;
+	public AssetManager manager;
 
 	public EscargotGame(IActivityRequestHandler handler) {
 		myRequestHandler = handler;
@@ -38,6 +42,14 @@ public class EscargotGame extends Game implements ApplicationListener {
 
 	@Override
 	public void create() {
+		manager = new AssetManager();
+		manager.load("magneto3.fnt", BitmapFont.class);
+		manager.load("vanilla.fnt", BitmapFont.class);
+		manager.load("nashville.fnt", BitmapFont.class);
+		manager.load("i18n/MyBundle", I18NBundle.class);
+		manager.load("background_0.jpg", Texture.class);
+		manager.load("pack.atlas", TextureAtlas.class);
+		
 		batch = new SpriteBatch();
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont(Gdx.files.internal("magneto3.fnt"));
@@ -68,8 +80,8 @@ public class EscargotGame extends Game implements ApplicationListener {
 		score_player.setScore(prefs.getFloat("max_score", 0.0f));
 		score_player.resetScore();
 		bg0 = new Texture(Gdx.files.internal("background_0.jpg"));
-		
-		mainMenuScreen = new MainMenuScreen(this);
+		atlas = new TextureAtlas(Gdx.files.internal("pack.atlas"));
+		mainMenuScreen = new LoadingScreen(this);
 		helpScreen = new HelpScreen(this);
 		endScreen = new EndScreen(this, score_player);
 		this.setScreen(mainMenuScreen);
@@ -95,5 +107,6 @@ public class EscargotGame extends Game implements ApplicationListener {
 		helpScreen.dispose();
 		endScreen.dispose();
 		bg0.dispose();
+		atlas.dispose();
 	}
 }

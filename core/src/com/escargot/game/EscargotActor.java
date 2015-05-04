@@ -1,30 +1,27 @@
 package com.escargot.game;
 
-import sun.java2d.loops.DrawRect;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.*;
 import com.badlogic.gdx.utils.Align;
 
 public class EscargotActor extends Actor {
 	TextureRegion texture;
+	public void setTexture(TextureRegion texture) {
+		this.texture = texture;
+	}
+
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 3892860159269540367L;
 	private static int w = 529;
 	private static int h = 187;
-	private static String tex_escargot = "escargot_0.png";
 	private int direction = 1;
 	
 	public EscargotActor() {
-		texture = new TextureRegion(new Texture(Gdx.files.internal(tex_escargot)));
 		setWidth(w); setHeight(h);setOrigin(Align.center);setPosition(320, 140);
 	}
 	
