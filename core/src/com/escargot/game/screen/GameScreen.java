@@ -13,13 +13,16 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.escargot.game.AbstractGameObject;
 import com.escargot.game.Escargot;
@@ -56,9 +59,13 @@ public class GameScreen implements Screen {
 	private ParticleEffect mort;
 	private boolean end = false;
 	private PooledEffect mortEffect;
+	private Skin skin;
 
 	public GameScreen(final EscargotGame game) {
 		this.game = game;
+		// Skin
+		skin = new Skin(game.manager.get("pack.atlas", TextureAtlas.class));
+		
 		// Sons
 		music_bg = Gdx.audio.newMusic(Gdx.files.internal("sound0.mp3"));
 		sound_train = Gdx.audio.newSound(Gdx.files.internal("sound2.wav"));
@@ -74,9 +81,9 @@ public class GameScreen implements Screen {
 		cam2.setToOrtho(false, 640, 480);
 
 		// Objets
-		obj_escargot = new Escargot(0, 20, 0.16f, 40);
-		obj_trainG = new Train(-626, 20, 1f, -1, 20);
-		obj_trainD = new Train(1920, 20, 1f, 1, 20);
+		obj_escargot = new Escargot(0, 20, 0.16f, 40, skin.getSprite("escargot"));
+		obj_trainG = new Train(-626, 20, 1f, -1, 20, skin.getSprite("train"));
+		obj_trainD = new Train(1920, 20, 1f, 1, 20, skin.getSprite("train"));
 
 		// Groupes de collision
 		listeTrains = new ArrayList<AbstractGameObject>();
@@ -94,7 +101,7 @@ public class GameScreen implements Screen {
 		effects = new Array<PooledEffect>();
 		fumee = new Fumee(game);
 		mort = new ParticleEffect();
-		mort.load(Gdx.files.internal("escargot"), Gdx.files.internal(""));
+		mort.load(Gdx.files.internal("escargot"), game.manager.get("pack.atlas", TextureAtlas.class));
 		mortPool = new ParticleEffectPool(mort, 1, 2);
 		mortEffect = mortPool.obtain();
 		fumeePool = new ParticleEffectPool(fumee, 1, 2);
@@ -245,7 +252,7 @@ public class GameScreen implements Screen {
 		game.batch.begin();
 
 		game.batch.setProjectionMatrix(camera.combined);
-		game.batch.draw(game.bg0, 0, 0, 1920, 1200);
+		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), 0, 0, 1920, 1200);
 		if (!end) {
 			obj_escargot.draw(game.batch);
 		}
@@ -264,7 +271,8 @@ public class GameScreen implements Screen {
 			}
 		}
 		game.batch.setProjectionMatrix(cam2.combined);
-		game.font.draw(game.batch, score_game.toString(), 340 - score_game
+		BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
+		font.draw(game.batch, score_game.toString(), 340 - score_game
 				.toString().length() / 2 * 20, 150);
 
 		game.batch.end();

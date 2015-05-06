@@ -6,6 +6,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -35,19 +37,18 @@ public class EndScreen implements Screen {
 		table.setFillParent(true);
 		stage.addActor(table);
 		skin = new Skin();
-		skin.add("retour", game.atlas.createSprite("back"));
-		skin.add("noter", game.atlas.createSprite("star"));
+		skin.addRegions(game.manager.get("pack.atlas", TextureAtlas.class));
 
-		retour = new Button(skin.getDrawable("retour"));
+		retour = new Button(skin.getDrawable("back"));
 		retour.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(game.mainMenuScreen);
+				game.setScreen(game.loadingScreen);
 			}
 		});
 
-		noter = new Button(skin.getDrawable("noter"));
+		noter = new Button(skin.getDrawable("star"));
 		noter.addListener(new ChangeListener() {
 
 			@Override
@@ -71,12 +72,14 @@ public class EndScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
-		game.font.draw(game.batch, game.gameover, 250, 350);
-		game.font
-				.draw(game.batch, game.score_txt + game.score_player, 200, 300);
-		game.font.draw(game.batch,
-				game.bestscore_txt + game.score_player.getMaxScore(), 200, 275);
+		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), -512, 0, 1920, 1200);
+		BitmapFont fontV = game.manager.get("vanilla.fnt", BitmapFont.class);
+		BitmapFont fontN = game.manager.get("nashville.fnt", BitmapFont.class);
+		fontN.draw(game.batch, game.bundle.get("gameover"), 100, 450);
+		fontN.draw(game.batch, game.bundle.get("score"), 100, 350);
+		fontV.draw(game.batch, ""+game.score_player, 200, 250);
+		fontN.draw(game.batch, game.bundle.get("bestscore"), 100, 150);
+		fontV.draw(game.batch, ""+ game.score_player.getMaxScore(), 200, 50);
 		//game.batch.draw(game.tex_escargot, 200, 20, 312, 198);
 		game.batch.end();
 

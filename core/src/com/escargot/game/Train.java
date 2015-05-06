@@ -1,7 +1,6 @@
 package com.escargot.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class Train extends AbstractGameObject {
 	private static final long serialVersionUID = 3892860159269540367L;
@@ -9,16 +8,15 @@ public class Train extends AbstractGameObject {
 	private static int h = 140;
 	private static int fum_x = 76;
 	private static int fum_y = 140;
-	private static String tex_train = "train_0.png";
 	private float scale;
 	
 	public Train(int x, int y, float scale, int direction,
-			int vitesse) {
+			int vitesse, Sprite train) {
 		super(x,
 			  y,
 			  w*scale,
 			  h*scale,
-			  new Texture(Gdx.files.internal(tex_train)),
+			  train,
 			  vitesse);
 		this.setScale(scale);
 		this.setDirection(direction);

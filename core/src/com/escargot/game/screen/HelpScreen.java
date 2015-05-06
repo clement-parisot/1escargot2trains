@@ -1,10 +1,14 @@
 package com.escargot.game.screen;
 
+import java.awt.Font;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -34,13 +38,13 @@ public class HelpScreen implements Screen {
 		table.setFillParent(true);
 		stage.addActor(table);
 		skin = new Skin();
-		skin.add("retour", game.atlas.createSprite("back"));
-		retour = new Button(skin.getDrawable("retour"));
+		skin.addRegions(game.manager.get("pack.atlas", TextureAtlas.class));
+		retour = new Button(skin.getDrawable("back"));
 		retour.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(game.mainMenuScreen);
+				game.setScreen(game.loadingScreen);
 			}
 		});
 		table.addActor(retour);
@@ -57,16 +61,17 @@ public class HelpScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
+		game.batch.draw(game.manager.get("background_0", Texture.class), -512, 0, 1920, 1200);
 		//game.batch.draw(game.tex_escargot, 300, 64, 161, 100);
-		game.font.draw(game.batch, game.help, 20, 350, 620, Align.center, true);
+		BitmapFont font = game.manager.get("fontVanilla", BitmapFont.class);
+		font.draw(game.batch, game.bundle.get("help"), 20, 350, 620, Align.center, true);
 		game.batch.end();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 
 		if (Gdx.input.justTouched()) {
-			game.setScreen(game.mainMenuScreen);
+			game.setScreen(game.loadingScreen);
 		}
 	}
 

@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.escargot.game.EscargotGame;
 
 /**
@@ -140,6 +141,10 @@ public class LoadingScreen implements Screen {
 			game.batch.begin();game.batch.end();
 
 	        if (game.manager.update()) { // Load some, will return true if done loading
+	        	game.bundle = game.manager.get("i18n/MyBundle", I18NBundle.class);
+	        	game.loadingScreen = new LoadingScreen(game);
+	    		game.helpScreen = new HelpScreen(game);
+	    		game.endScreen = new EndScreen(game, game.score_player);
 	            game.setScreen(new MainMenuScreen(game));
 	        }
 	        
@@ -174,6 +179,7 @@ public class LoadingScreen implements Screen {
 
 		@Override
 		public void dispose() {
-			manager.dispose();
+			if(manager != null)
+				manager.dispose();
 		}
 	}

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -47,7 +48,7 @@ public class ScoreScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(game.mainMenuScreen);
+				game.setScreen(game.loadingScreen);
 				dispose();
 			}
 		});
@@ -108,9 +109,10 @@ public class ScoreScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.bg0, -512, 0, 1920, 1200);
+		game.batch.draw(game.manager.get("background_0", Texture.class), -512, 0, 1920, 1200);
 		if (!isSignedIn) {
-			game.font.draw(game.batch,
+			BitmapFont font = game.manager.get("fontVanilla", BitmapFont.class);
+			font.draw(game.batch,
 					"Please sign in to Google Play Game", 160, 240, 320,
 					Align.center, true);
 			sign_in.setVisible(true);

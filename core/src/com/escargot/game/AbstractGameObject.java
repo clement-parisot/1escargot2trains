@@ -3,19 +3,20 @@ package com.escargot.game;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public abstract class AbstractGameObject extends Rectangle {
 	private static final long serialVersionUID = -6681616551560807046L;
-	protected Texture texture;
+	protected Sprite texture;
 	private int direction = 1;
 	public int vitesse;
 
-	protected AbstractGameObject(float x, float y, float w, float h, Texture t,
+	protected AbstractGameObject(float x, float y, float w, float h, Sprite sprite,
 			int vitesse) {
 		super(x, y, w, h);
-		this.texture = t;
+		this.texture = sprite;
 		this.vitesse = vitesse;
 	}
 
@@ -46,6 +47,6 @@ public abstract class AbstractGameObject extends Rectangle {
 	}
 	
 	public void dispose(){
-		this.texture.dispose();
+		// Dispose Texture ?
 	}
 }
