@@ -30,6 +30,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public AssetManager manager;
 	private Preferences prefs;
 	public I18NBundle bundle;
+	public boolean pause = false;
 
 	public EscargotGame(IActivityRequestHandler handler) {
 		myRequestHandler = handler;
@@ -43,6 +44,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 		manager.load("nashville.fnt", BitmapFont.class);
 		manager.load("i18n/MyBundle", I18NBundle.class);
 		manager.load("background_0.jpg", Texture.class);
+		manager.load("rails_0.png", Texture.class);
 		manager.load("pack.atlas", TextureAtlas.class);
 		loadingScreen = new LoadingScreen(this);
 		this.setScreen(loadingScreen);

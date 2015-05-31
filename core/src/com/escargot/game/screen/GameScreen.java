@@ -10,6 +10,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.escargot.game.AbstractGameObject;
 import com.escargot.game.Escargot;
@@ -237,6 +239,7 @@ public class GameScreen implements Screen {
 		float distg = posEscargot.x - posTrainG.x;
 		float distd = posTrainD.x - posEscargot.x;
 		float dist = Math.min(Math.abs(distg), Math.abs(distd));
+		
 		if (!end) {
 			move(delta);
 			score_update(dist, delta);
@@ -272,19 +275,22 @@ public class GameScreen implements Screen {
 		}
 		game.batch.setProjectionMatrix(cam2.combined);
 		BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
-		font.draw(game.batch, score_game.toString(), 340 - score_game
-				.toString().length() / 2 * 20, 150);
+		font.setFixedWidthGlyphs(score_game.toString());
+		font.draw(game.batch, score_game.toString(), 160, 420, 320, Align.center, false);
 
 		game.batch.end();
-		game.sr.begin(ShapeType.Filled);
+		//Barre de sante
 		game.sr.setProjectionMatrix(cam2.combined);
-		game.sr.setColor(Math.max(0.0f, 1.0f - dist / 1272.0f),
-				Math.min(dist / 1272.0f, 1.0f), 0.1f, 1);
-		game.sr.rect(288, 170, dist / 8, 20);
-		game.sr.setProjectionMatrix(camera.combined);
-		game.sr.circle(posEscargot.x, posEscargot.y, 3.0f);
-		game.sr.circle(posTrainD.x, posTrainD.y, 3.0f);
-		game.sr.circle(posTrainG.x, posTrainG.y, 3.0f);
+		game.sr.begin(ShapeType.Filled);
+		game.sr.rect(160, 0, 320, 30, Color.RED, Color.GREEN, Color.GREEN, Color.RED);
+		game.sr.setColor(0,0,0,1);
+		game.sr.rect(480, 0, Math.min(Math.max(-1*Math.round((1-dist)*320/32)*32, -320), 0), 30);
+		game.sr.end();
+		game.sr.begin(ShapeType.Line);
+		game.sr.setColor(0,0,0,1);
+		for(int i = 0; i <= 320; i+=32){
+			game.sr.rect(160, 0, i, 30);
+		}
 		game.sr.end();
 		if (!end) {
 			if (collision(obj_escargot, listeTrains)) {
@@ -307,12 +313,8 @@ public class GameScreen implements Screen {
 	}
 
 	private void score_update(float dist, float delta) {
-		float x = 0.0f;
-		if (dist < 600) {
-			x = ((600 - dist) / 600);
-		}
-		double pas = Math.floor(1.0 + 100.0 * Math.pow(x, 10));
-		score_game.setScore(pas * 2.0 * delta);
+		double pas = Math.pow(2, Math.round(Math.max(Math.min((1-dist), 1),0)*10));
+		score_game.setScore(pas * delta);
 	}
 
 	private void camera_zoom(float dist, Vector2 posEscargot) {

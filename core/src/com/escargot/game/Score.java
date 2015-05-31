@@ -2,11 +2,12 @@ package com.escargot.game;
 
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.NumberFormat;
 
 public class Score {
 	private float score;
 	private static float max_score;
-	private Format df = new DecimalFormat("###,###");
+	private Format df = new DecimalFormat("000,000");
 
 	public Score() {
 		this.score = 0;

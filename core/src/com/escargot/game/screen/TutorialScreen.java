@@ -1,81 +1,149 @@
  package com.escargot.game.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotActor;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Fumee;
 import com.escargot.game.RailActor;
 import com.escargot.game.Score;
 import com.escargot.game.TrainActor;
+import com.escargot.game.screen.GameScreen.MyInputProcessorKey;
+import com.escargot.game.screen.GameScreen.MyInputProcessorTouch;
+import com.escargot.game.tuto.EscargotActorTuto;
+import com.escargot.game.tuto.RailActorTuto;
+import com.escargot.game.tuto.TrainActorTuto;
 
 public class TutorialScreen implements Screen {
 	final EscargotGame game;
-	Button but_play, but_score, but_quit;
-	Button but_son_on, but_son_off, but_aide, but_vibre_on, but_vibre_off;
 
-	OrthographicCamera camera;
+	OrthographicCamera cameraGame;
 	private Stage stage;
 	private Skin skin;
-	private HorizontalGroup main_buttons;
-	private EscargotActor escargot;
+	private EscargotActorTuto escargot;
 	private Array<PooledEffect> effects;
 	private Fumee fumee;
 	private ParticleEffectPool fumeePool;
-	private TrainActor trainG;
-	private TrainActor trainD;
-	private String vanillaString;
-	private String nashString;
-	private OrthographicCamera cam2;
+	private TrainActorTuto trainG;
+	private TrainActorTuto trainD;
+	private OrthographicCamera cameraScore;
 	private Music music_bg;
 	private Sound sound_train;
 	private Sound sound_mort;
 	private float zoom_factor;
 
+	private Sprite spriteBgd;
+
+	private float scrollTimer=0.0f;
+
+	private Texture spriteRails;
+
+	private Score score_game;
+	
+	// Animation steps
+	private boolean step0_displayText = true;
+	private boolean step1_displayRight = false;
+	private boolean step1_5_wait = false;
+	private boolean step2_displayScore = false;
+	private boolean step2_5_wait = false;
+	private boolean step3_displayLeft = false;
+	private boolean step4_displaySante = false;
+	private float elapsedTime = 0;
+
+	public boolean faster;
+
+	private Animation animation;
+
 	public TutorialScreen(final EscargotGame game, Score score) {
 		this.game = game;
+		stage = new Stage(new StretchViewport(1920, 1200)){
+			@Override
+			public boolean keyDown(int keycode) {
+				if(step0_displayText){
+					game.resume();
+					step0_displayText = false;
+				}
+				if(step2_displayScore){
+					game.resume();
+					step2_5_wait = true;
+					step2_displayScore = false;
+				}
+				if(step3_displayLeft){
+					game.resume();
+					step4_displaySante = true;
+					step3_displayLeft = false;
+				}
+				if (keycode == Keys.LEFT) {
+					faster = true;
+					escargot.setVitesse(1.2);
+					escargot.flip(0);
+					return true;
+				}
+				if (keycode == Keys.RIGHT) {
+					faster = true;
+					escargot.setVitesse(1.2);
+					escargot.flip(640);
+					if(step1_displayRight){
+						game.resume();
+						step1_5_wait = true;
+						step1_displayRight = false;
+					}
+					return true;
+				}
+				return true;
+			}
 
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 640, 480);
-		stage = new Stage(new StretchViewport(640, 480));
-		main_buttons = new HorizontalGroup();
-		main_buttons.align(Align.center);
+			@Override
+			public boolean keyUp(int keycode) {
+				faster = false;
+				escargot.setVitesse(0.6);
+				return true;
+			}
+		};
+		stage.setDebugAll(true);
+		score_game = new Score();
+
 		
-		stage.addActor(main_buttons);
-		
-		// Camera
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 2048, 1024);
-		cam2 = new OrthographicCamera();
-		cam2.setToOrtho(false, 640, 480);
+		// Tout l'ecran de jeu (1920/1200)
+		cameraGame = (OrthographicCamera) stage.getCamera();
+		cameraGame.setToOrtho(false, 1920, 1200);
+		cameraScore = new OrthographicCamera();
+		cameraScore.setToOrtho(false, 640, 480);
 		
 		// Sons
 		music_bg = Gdx.audio.newMusic(Gdx.files.internal("sound0.mp3"));
@@ -86,89 +154,20 @@ public class TutorialScreen implements Screen {
 		music_bg.setLooping(true);
 
 		skin = new Skin();
-		// Main buttons
+		// Load textures
 		skin.addRegions(game.manager.get("pack.atlas", TextureAtlas.class));
-		
-		// Button
-		but_son_on = new Button(skin.getDrawable("son_on"));
-		but_son_on.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.son_on = false;
-			}
-		});
-		but_son_off = new Button(skin.getDrawable("son_off"));
-		but_son_off.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.son_on = true;
-			}
-		});
-		but_vibre_on = new Button(skin.getDrawable("vibre_on"));
-		but_vibre_on.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.vibre_on = false;
-			}
-		});
-		but_vibre_off = new Button(skin.getDrawable("vibre_off"));
-		but_vibre_off.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.vibre_on = true;
-				Gdx.input.vibrate(1000);
-			}
-		});
-		but_play = new Button(skin.getDrawable("play"));
-		but_play.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(new GameScreen(game));
-			}
-		});
-		but_score = new Button(skin.getDrawable("score"));
-		but_score.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(new ScoreScreen(game));
-			}
-		});
-		but_quit = new Button(skin.getDrawable("signOut"));
-		but_quit.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				Gdx.app.exit();
-			}
-		});
-		// Add to stage
-		main_buttons.addActor(but_score);
-		main_buttons.addActor(but_play);
-		main_buttons.addActor(but_quit);
-		
-		escargot = new EscargotActor(320, 140, 0.16f, 0);
-		escargot.setTexture(skin.getSprite("escargot"));
-		escargot.addAction(Actions.forever(Actions.sequence(
-				Actions.moveToAligned(200.0f,140.0f,Align.bottomLeft,1.0f,Interpolation.sine),
-                Actions.scaleTo(-1.0f, 1.0f),
-				Actions.moveToAligned(440.0f,140.0f,Align.bottomRight,1.0f,Interpolation.sine), 
-				Actions.scaleTo(1.0f, 1.0f))));
+		TextureAtlas atlas =  game.manager.get("pack.atlas", TextureAtlas.class);
+		escargot = new EscargotActorTuto(0, 145, 0.16f, 0.6);
+		escargot.setPosition(0, 147, Align.bottomLeft);
+		animation = new Animation(1/15f, atlas.findRegions("escargot"));
+		escargot.setTexture(animation);
 		stage.addActor(escargot);
-		trainG = new TrainActor(200,140,0.5f,-1,0);
+		trainG = new TrainActorTuto(0, 150, 0.5f,-1,0.4);
 		trainG.setTexture(skin.getSprite("train"));
 		stage.addActor(trainG);
-		trainD = new TrainActor(440,140,0.5f,1,0);
+		trainD = new TrainActorTuto(1920, 150,0.5f,1,0.4);
 		trainD.setTexture(skin.getSprite("train"));
 		stage.addActor(trainD);
-		RailActor rails = new RailActor();
-		rails.setTexture(skin.getSprite("rails"));
-		stage.addActor(rails);
 		stage.act(1);
 		
 		effects = new Array<PooledEffect>();
@@ -180,122 +179,232 @@ public class TutorialScreen implements Screen {
 		PooledEffect effect2 = fumeePool.obtain();
 		effect2.setPosition(trainD.getFumX(), trainD.getFumY());
 		effects.add(effect2);
+		stage.addListener(new ActorGestureListener(20.0f,0.4f,0.3f,0.15f){
 
-		main_buttons.pack();
-		main_buttons.setPosition(320, 0, Align.bottom+Align.center);
+			@Override
+			public boolean longPress(Actor actor, float x, float y) {
+				if(step1_displayRight){
+					step1_5_wait = true;
+					step1_displayRight = false;
+					game.resume();
+				}
+				if (!step1_displayRight && !step1_5_wait && !step2_displayScore && !step2_5_wait && ! step3_displayLeft && !step4_displaySante)
+					return true;
+				escargot.setVitesse(1.2);
+				faster = true;
+				return false;
+			}
+			
+			@Override
+			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				if(step0_displayText){
+					game.resume();
+					step0_displayText = false;
+				}
+				if(step2_displayScore){
+					game.resume();
+					step2_5_wait = true;
+					step2_displayScore = false;
+				}
+				if(step3_displayLeft){
+					game.resume();
+					step4_displaySante = true;
+					step3_displayLeft = false;
+				}
+				if (!step1_displayRight && !step1_5_wait && !step2_displayScore && !step2_5_wait && !step3_displayLeft && !step4_displaySante)
+					return;
+				x = stage.stageToScreenCoordinates(new Vector2(x, y)).x;
+				if (step3_displayLeft || step4_displaySante)
+					escargot.flip((int) x);
+				escargot.setVitesse(1.2);
+				faster = true;
+			}
+			
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				faster = false;
+				escargot.setVitesse(0.6);
+			}
+		});
+		
 		// Pub
-		game.myRequestHandler.showAds(true);
-		Table t = new Table();
-		
-		t.defaults().pad(10);
-		stage.addActor(t);
-		//t.setFillParent(true);
-		
-		LabelStyle vanillaStyle = new LabelStyle(game.manager.get("vanilla.fnt",BitmapFont.class), Color.WHITE);
-		LabelStyle nashStyle = new LabelStyle(game.manager.get("nashville.fnt",BitmapFont.class), Color.WHITE);
-		Container<Label> lab_1 = new Container<Label>(new Label("1", vanillaStyle));
-		Container<Label> lab_2 = new Container<Label>(new Label("2", vanillaStyle));
-		Container<Label> lab_escargot = new Container<Label>(new Label(game.bundle.get("snail"), nashStyle));
-		Container<Label> lab_trains = new Container<Label>(new Label(game.bundle.get("trains"), nashStyle));
-		lab_1.setTransform(true);
-		lab_1.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
-		lab_escargot.setTransform(true);
-		lab_escargot.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.delay(0.5f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
-		lab_2.setTransform(true);
-		lab_2.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.delay(1f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
-		lab_trains.setTransform(true);
-		lab_trains.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.delay(1.5f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
-        t.add(lab_1);
-		t.add(lab_escargot);
-		//t.row();
-		t.add(lab_2);
-		t.add(lab_trains);
-		t.pack();
-		t.setPosition(320, 420, Align.top+Align.center);
+		game.myRequestHandler.showAds(false);
+		Texture spriteTexture = game.manager.get("background_0.jpg",Texture.class);
+		spriteTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
+		spriteBgd = new Sprite(spriteTexture, 0, 0, 2048, 1024);
+		spriteBgd.setSize(1920, 1200);
+		spriteRails = game.manager.get("rails_0.png",Texture.class);
+		spriteRails.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 	}
 	
 	private void camera_zoom(float dist, Vector2 posEscargot) {
-		float pas = dist / 1200.0f;
-		zoom_factor = Math.max(0.1f, Math.min(pas, 1.0f));
-		camera.viewportHeight = 1200 * zoom_factor;
-		camera.position.y = camera.viewportHeight / 2;
-		camera.viewportWidth = 1920 * zoom_factor;
-		camera.position.x = Math.min(
-				Math.max(posEscargot.x, camera.viewportWidth / 2),
-				1920 - camera.viewportWidth / 2);
+		
+		float pas = Interpolation.linear.apply(dist);
+		zoom_factor = Math.max(0.2f, Math.min(pas, 1.0f));
+		cameraGame.viewportHeight = 1200 * zoom_factor;
+		cameraGame.position.y = Math.max(cameraGame.viewportHeight / 2, posEscargot.y);
+		cameraGame.viewportWidth = 1920 * zoom_factor;
+		cameraGame.position.x = Math.min(
+				Math.max(posEscargot.x, cameraGame.viewportWidth / 2),
+				1920 - cameraGame.viewportWidth / 2);
 	}
 
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		elapsedTime += Gdx.graphics.getDeltaTime();
 
-		camera.update();
-		game.batch.setProjectionMatrix(camera.combined);
-
+		float distEG = escargot.getX(Align.left);
+		float distED = escargot.getX(Align.right);
+		float distTG = trainG.getX(Align.left);
+		float distTD = trainD.getX(Align.left);
+		float distg = distEG - distTG;
+		float distd = distTD - distED;
+		float dist = 2 * Math.min(Math.abs(distg), Math.abs(distd))/ (distTD-distTG-escargot.getWidth());
+		camera_zoom(Math.min(Math.abs(distg), Math.abs(distd))/700, new Vector2(escargot.getX(Align.center), escargot.getY(Align.center)));
+		cameraGame.update();
+		cameraScore.update();
 		game.batch.begin();
-		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), 0, 0, 2048, 1024);
+		game.batch.setProjectionMatrix(cameraGame.combined);
+		//game.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
+		scrollTimer+=Gdx.graphics.getDeltaTime()*0.1f;
+	     if(scrollTimer>2.0f)
+	         scrollTimer = 0.0f;
+	                
+//	     spriteBgd.setU(scrollTimer);
+//	     spriteBgd.setU2(scrollTimer+1);
+//	     spriteRails.setU(scrollTimer);
+//	     spriteRails.setU2(scrollTimer+1);
+		game.batch.draw(spriteBgd, 0, 0, 1920, 1200);
+		game.batch.draw(spriteRails, 0, 118, 0, 0, 1920, 32);
 		// Update and draw effects:
+		effects.get(0).setPosition(trainG.getFumX(), trainG.getFumY());
+		effects.get(1).setPosition(trainD.getFumX(), trainD.getFumY());
+		game.batch.end();
+		if(!game.pause){
+			stage.act(Gdx.graphics.getDeltaTime());
+			score_update(dist, delta);
+		}
+		stage.draw();
+		if(!step1_displayRight && dist > 0.05 && !step1_5_wait && !step2_displayScore && !step2_5_wait && ! step3_displayLeft && !step4_displaySante){
+			step1_displayRight = true;
+			game.pause();
+		}
+		
+		game.sr.setProjectionMatrix(cameraScore.combined);
+		game.sr.begin(ShapeType.Filled);
+		if(step1_displayRight || (faster && escargot.getDirection() == 1)){
+			game.sr.rect(640, 0, -64, 480, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
+		}
+		if(step2_displayScore|| step3_displayLeft || step4_displaySante){
+		}
+		if(step3_displayLeft || ((step3_displayLeft  || step4_displaySante) && faster && escargot.getDirection() == -1)){
+			game.sr.rect(0, 0, 64, 480, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
+		}
+		if(step4_displaySante){
+			game.sr.rect(160, 0, 320, 30, Color.RED, Color.GREEN, Color.GREEN, Color.RED);
+			game.sr.setColor(0,0,0,1);
+			game.sr.rect(480, 0, Math.min(Math.max(-1*Math.round((dist)*320/32)*32, -320), 0), 30);
+			game.sr.end();
+			game.sr.begin(ShapeType.Line);
+			game.sr.setColor(0,0,0,1);
+			for(int i = 0; i <= 320; i+=32){
+				game.sr.rect(160, 0, i, 30);
+			}
+		}
+		game.sr.end();
+		game.batch.begin();
 		for (int i = effects.size - 1; i >= 0; i--) {
 			PooledEffect effect = effects.get(i);
-			effect.draw(game.batch, delta);
+			if(!game.pause)
+				effect.draw(game.batch, delta);
+			else
+				effect.draw(game.batch);
+		}
+		game.batch.setProjectionMatrix(cameraScore.combined);
+		// Step0
+		if(step0_displayText){
+			BitmapFont font = game.manager.get("nashville.fnt", BitmapFont.class);
+			font.draw(game.batch, game.bundle.get("help"), 0, 480, 640, Align.left, true);
+			game.pause();
+		}
+		if(step1_displayRight || step1_5_wait || step2_displayScore || step2_5_wait || step3_displayLeft || step4_displaySante){
+			if(faster && escargot.getDirection() == 1)
+				game.batch.draw(skin.getSprite("fastRight"), 576, 240);
+			else
+				game.batch.draw(skin.getSprite("right"), 576, 240);
+		}
+		if(step1_5_wait && distd < 1000){
+			game.pause();
+			step2_displayScore = true;
+			step1_5_wait = false;
+		}
+		if(step2_displayScore|| step2_5_wait || step3_displayLeft || step4_displaySante){
+			BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
+			font.setFixedWidthGlyphs(score_game.toString());
+			font.draw(game.batch, score_game.toString(), 160, 475, 320, Align.center, false);
+			font.draw(game.batch, "+10", 160, 415, 320, Align.center, false);
+		}
+		if(step2_5_wait && distd < distg){
+			game.pause();
+			step3_displayLeft = true;
+			step2_5_wait = false;
+		}
+		if(step3_displayLeft || step4_displaySante){	
+			if(faster && escargot.getDirection() == -1)
+				game.batch.draw(skin.getSprite("fastLeft"), 0, 240);
+			else
+				game.batch.draw(skin.getSprite("left"), 0, 240);
+
+		}
+		if(step4_displaySante){
 		}
 
 		game.batch.end();
-		but_son_on.setVisible(EscargotGame.son_on);
-		but_son_off.setVisible(!EscargotGame.son_on);
-		but_vibre_on.setVisible(EscargotGame.vibre_on);
-		but_vibre_off.setVisible(!EscargotGame.vibre_on);
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
 
-		if (Gdx.input.justTouched()) {
-			Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),
-					0);
-			camera.unproject(touchPos);
-			if (touchPos.y > 70) {
-				Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
-				if (prefs.getBoolean("firstGame", true)) {
-					prefs.putBoolean("firstGame", false);
-					prefs.flush();
-					game.setScreen(new TutorialScreen(game, new Score()));
-				} else {
-					game.setScreen(new GameScreen(game));
-				}
-			}
-		}
+	}
+	private void score_update(float dist, float delta) {
+		double pas = Math.pow(2, Math.round(Math.max(Math.min((1-dist), 1),0)*10));
+		score_game.setScore(pas * delta);
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
 	}
-
+	
 	@Override
 	public void show() {
 		if (EscargotGame.son_on) {
-			sound_train.play();
-			music_bg.play();
+			//sound_train.play();
+			//music_bg.play();
 		}
 		game.myRequestHandler.showAds(false);
 		Gdx.input.setInputProcessor(stage);
-		but_son_on.setVisible(EscargotGame.son_on);
-		but_son_off.setVisible(!EscargotGame.son_on);
-		but_vibre_on.setVisible(EscargotGame.vibre_on);
-		but_vibre_off.setVisible(!EscargotGame.vibre_on);
 	}
 
 	@Override
 	public void hide() {
 		game.myRequestHandler.showAds(false);
+		sound_train.stop();
+		music_bg.stop();
 	}
 
 	@Override
 	public void pause() {
+		game.pause = true;
+		sound_train.stop();
+		music_bg.stop();
 	}
 
 	@Override
 	public void resume() {
+		if (EscargotGame.son_on) {
+			//sound_train.play();
+			//music_bg.play();
+		}
+		game.pause = false;
 	}
 
 	@Override
@@ -304,8 +413,7 @@ public class TutorialScreen implements Screen {
 		sound_train.dispose();
 		sound_mort.dispose();
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
-		prefs.putBoolean("son_on", EscargotGame.son_on);
-		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
+		prefs.putBoolean("tutorial", true);
 		prefs.flush();
 		stage.dispose();
 		skin.dispose();

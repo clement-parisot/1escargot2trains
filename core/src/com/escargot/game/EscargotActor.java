@@ -20,6 +20,7 @@ public class EscargotActor extends Actor {
 	private static int w = 529;
 	private static int h = 187;
 	private int direction = 1;
+	private int vitesse;
 	
 	public EscargotActor() {
 		setWidth(w); setHeight(h);setOrigin(Align.center);setPosition(320, 140);
@@ -27,8 +28,14 @@ public class EscargotActor extends Actor {
 	
 	public EscargotActor(int x, int y, float scale, int vitesse) {
 		this();
+		this.vitesse = vitesse;
 		setWidth(w*scale); setHeight(h*scale);setOrigin(Align.center);setPosition(x, y);
-		addAction(Actions.forever(Actions.moveBy(vitesse*direction, 0)));
+		addAction(Actions.forever(
+				Actions.parallel(
+						Actions.scaleTo(-direction, 1.0f),
+						Actions.moveBy(vitesse*direction, 0))
+				)
+		);
 	}
 	
     @Override
@@ -50,6 +57,11 @@ public class EscargotActor extends Actor {
 				direction =-1;
 		}
 		clearActions();
-		this.addAction(Actions.forever(Actions.moveBy(direction, 0)));
+		this.addAction(Actions.forever(
+				Actions.parallel(
+						Actions.scaleTo(-direction, 1.0f),
+						Actions.moveBy(vitesse*direction, 0))
+				)
+		);
 	}
 }

@@ -140,12 +140,12 @@ public class LoadingScreen implements Screen {
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			game.batch.begin();game.batch.end();
 
-	        if (game.manager.update()) { // Load some, will return true if done loading
+	        if (game.manager.update() && percent >= 0.99f) { // Load some, will return true if done loading
 	        	game.bundle = game.manager.get("i18n/MyBundle", I18NBundle.class);
-	        	game.loadingScreen = new LoadingScreen(game);
+	        	game.loadingScreen = new MainMenuScreen(game);
 	    		game.helpScreen = new HelpScreen(game);
 	    		game.endScreen = new EndScreen(game, game.score_player);
-	            game.setScreen(new MainMenuScreen(game));
+	            game.setScreen(new TutorialScreen(game, game.score_player));
 	        }
 	        
 	        // Interpolate the percentage to make it more smooth
