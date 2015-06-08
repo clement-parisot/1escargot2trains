@@ -1,15 +1,12 @@
 package com.escargot.game.tuto;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.*;
 import com.badlogic.gdx.utils.Align;
 
-public class EscargotActorTuto extends Actor {
+public class EscargotActorMenu extends Actor {
 	Animation texture;
 	private float stateTime = 0;
 	public void setTexture(Animation texture) {
@@ -38,7 +35,6 @@ public class EscargotActorTuto extends Actor {
 	    stateTime = 0;
 	}
 	private double vitesse;
-	private Rectangle bounds;
 
 	public double getVitesse() {
 		return vitesse;
@@ -47,33 +43,18 @@ public class EscargotActorTuto extends Actor {
 	public void setVitesse(double vitesse) {
 		if(this.vitesse != vitesse){
 			this.vitesse = vitesse;
-			clearActions();
-			this.addAction(Actions.forever(
-					Actions.parallel(
-							Actions.scaleTo(-direction, 1.0f),
-							Actions.moveBy((float) (vitesse*direction), 0))
-					)
-					);
 		}
 	}
 
-	public EscargotActorTuto() {
+	public EscargotActorMenu() {
 		setWidth(w); setHeight(h);setOrigin(Align.center);setPosition(320, 140);
-		bounds=new Rectangle((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
 	}
 
-	public EscargotActorTuto(int x, int y, float scale, double vitesse) {
+	public EscargotActorMenu(int x, int y, float scale, double vitesse) {
 		this();
 		this.vitesse = vitesse;
 		setWidth(w*scale); setHeight(h*scale);setOrigin(Align.center);
 		setPosition(x, y, Align.center+Align.bottom);
-		addAction(Actions.forever(
-				Actions.parallel(
-						Actions.scaleTo(-direction, 1.0f),
-						Actions.moveBy((float) (vitesse*direction), 0))
-				)
-				);
-		bounds=new Rectangle((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
 	}
 
 	@Override
@@ -82,25 +63,5 @@ public class EscargotActorTuto extends Actor {
 		this.texture.setFrameDuration((float) (1/(getVitesse()*30f)));
 		batch.draw(this.texture.getKeyFrame(this.stateTime, true), getX(), getY(), getOriginX(), getOriginY(),
 				getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
-	    bounds.setX(getX());
-	    bounds.setY(getY());
-	}
-
-	public void flip(int x) {
-		if (x < Gdx.graphics.getWidth()/2)
-			direction = -1;
-		else
-			direction = 1;
-		clearActions();
-		this.addAction(Actions.forever(
-				Actions.parallel(
-						Actions.scaleTo(-direction, 1.0f),
-						Actions.moveBy((float) (vitesse*direction), 0))
-				)
-				);
-	}
-
-	public Rectangle getBounds() {
-		return bounds;
 	}
 }

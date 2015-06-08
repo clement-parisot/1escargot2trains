@@ -2,7 +2,6 @@ package com.escargot.game;
 
 import java.text.DecimalFormat;
 import java.text.Format;
-import java.text.NumberFormat;
 
 public class Score {
 	private float score;
@@ -38,8 +37,7 @@ public class Score {
 	}
 
 	public String getMaxScore() {
-		return df.format(max_score);
-		// return ""+(int)max_score;
+		return df.format((int)max_score);
 	}
 
 	public float getMaxScoreValue() {

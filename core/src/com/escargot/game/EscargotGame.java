@@ -6,21 +6,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.escargot.game.screen.EndScreen;
-import com.escargot.game.screen.HelpScreen;
 import com.escargot.game.screen.LoadingScreen;
 
 public class EscargotGame extends Game implements ApplicationListener {
-	public SpriteBatch batch;
-	public ShapeRenderer sr;
 	public Score score_player;
 	public static boolean son_on = true;
 	public static boolean vibre_on = true;
@@ -31,6 +25,8 @@ public class EscargotGame extends Game implements ApplicationListener {
 	private Preferences prefs;
 	public I18NBundle bundle;
 	public boolean pause = false;
+	public SpriteBatch batch;
+	public ShapeRenderer sr;
 
 	public EscargotGame(IActivityRequestHandler handler) {
 		myRequestHandler = handler;
@@ -61,6 +57,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 		}
 		score_player.resetScore();
 		score_player.setScore(prefs.getFloat("max_score", 0.0f));
+		score_player.updateBestScore();
 		score_player.resetScore();
 
 	}

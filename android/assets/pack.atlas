@@ -4,295 +4,225 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-escargot
-  rotate: false
-  xy: 0, 768
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 0
-escargot
-  rotate: false
-  xy: 0, 768
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 19
-escargot
-  rotate: false
-  xy: 512, 768
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 1
-escargot
-  rotate: false
-  xy: 512, 768
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 18
-escargot
-  rotate: false
-  xy: 0, 576
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 2
-escargot
-  rotate: false
-  xy: 0, 576
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 17
-escargot
-  rotate: false
-  xy: 512, 576
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 3
-escargot
-  rotate: false
-  xy: 512, 576
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 16
-escargot
-  rotate: false
-  xy: 0, 384
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 4
-escargot
-  rotate: false
-  xy: 0, 384
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 15
-escargot
-  rotate: false
-  xy: 512, 384
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 5
-escargot
-  rotate: false
-  xy: 512, 384
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 14
-escargot
-  rotate: false
-  xy: 0, 192
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 6
-escargot
-  rotate: false
-  xy: 0, 192
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 13
-escargot
-  rotate: false
-  xy: 0, 0
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 7
-escargot
-  rotate: false
-  xy: 0, 0
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 12
-escargot
-  rotate: false
-  xy: 512, 192
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 8
-escargot
-  rotate: false
-  xy: 512, 192
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 11
-escargot
-  rotate: false
-  xy: 512, 0
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 9
-escargot
-  rotate: false
-  xy: 512, 0
-  size: 512, 192
-  orig: 512, 192
-  offset: 0, 0
-  index: 10
-rails
-  rotate: false
-  xy: 0, 960
-  size: 1024, 64
-  orig: 1024, 64
-  offset: 0, 0
-  index: 0
-
-pack2.png
-size: 1024,256
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-SmokeShape
-  rotate: false
-  xy: 576, 0
-  size: 256, 256
-  orig: 256, 256
-  offset: 0, 0
-  index: -1
 achiev
   rotate: false
-  xy: 832, 192
+  xy: 512, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 aide
   rotate: false
-  xy: 128, 64
+  xy: 576, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 back
   rotate: false
-  xy: 128, 0
+  xy: 640, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+escargot
+  rotate: false
+  xy: 512, 832
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 0
+escargot
+  rotate: false
+  xy: 512, 640
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 1
+escargot
+  rotate: false
+  xy: 0, 635
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 2
+escargot
+  rotate: false
+  xy: 512, 448
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 3
+escargot
+  rotate: false
+  xy: 0, 443
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 4
+escargot
+  rotate: false
+  xy: 512, 256
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 5
+escargot
+  rotate: false
+  xy: 0, 251
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 6
+escargot
+  rotate: false
+  xy: 512, 64
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 7
+escargot
+  rotate: false
+  xy: 0, 59
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 8
+escargot_end
+  rotate: false
+  xy: 0, 827
+  size: 512, 197
+  orig: 512, 197
+  offset: 0, 0
+  index: -1
 fastLeft
   rotate: false
-  xy: 832, 128
+  xy: 704, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 fastRight
   rotate: false
-  xy: 896, 192
+  xy: 768, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 leader
   rotate: false
-  xy: 960, 192
+  xy: 832, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 left
   rotate: false
-  xy: 192, 64
+  xy: 896, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 param
   rotate: false
-  xy: 192, 0
+  xy: 960, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+
+pack2.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+SmokeShape
+  rotate: false
+  xy: 576, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+escargot
+  rotate: false
+  xy: 0, 320
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 9
 play
   rotate: false
-  xy: 0, 0
+  xy: 0, 64
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 right
   rotate: false
-  xy: 832, 64
+  xy: 512, 448
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 score
   rotate: false
-  xy: 832, 0
+  xy: 0, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 signIn
   rotate: false
-  xy: 896, 128
+  xy: 512, 384
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 signOut
   rotate: false
-  xy: 960, 128
+  xy: 512, 320
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 son_off
   rotate: false
-  xy: 256, 64
+  xy: 64, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 son_on
   rotate: false
-  xy: 256, 0
+  xy: 576, 192
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 star
   rotate: false
-  xy: 896, 64
+  xy: 832, 448
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 train
   rotate: false
-  xy: 0, 128
+  xy: 0, 192
   size: 576, 128
   orig: 576, 128
   offset: 0, 0
   index: 0
 vibre_off
   rotate: false
-  xy: 896, 0
+  xy: 128, 128
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 vibre_on
   rotate: false
-  xy: 960, 64
+  xy: 640, 192
   size: 64, 64
   orig: 64, 64
   offset: 0, 0

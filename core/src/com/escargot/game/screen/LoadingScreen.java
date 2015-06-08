@@ -37,6 +37,7 @@ public class LoadingScreen implements Screen {
 	    public LoadingScreen(EscargotGame game) {
 	        super();
 	        this.game = game;
+	        game.myRequestHandler.showAds(false);
 	    }
 
 	    @Override
@@ -144,8 +145,8 @@ public class LoadingScreen implements Screen {
 	        	game.bundle = game.manager.get("i18n/MyBundle", I18NBundle.class);
 	        	game.loadingScreen = new MainMenuScreen(game);
 	    		game.helpScreen = new HelpScreen(game);
-	    		game.endScreen = new EndScreen(game, game.score_player);
-	            game.setScreen(new TutorialScreen(game, game.score_player));
+	    		game.endScreen = new EndScreen(game);
+	            game.setScreen(game.loadingScreen);
 	        }
 	        
 	        // Interpolate the percentage to make it more smooth

@@ -5,7 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -13,7 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.tuto.TrainActorTuto;
 
 public class ScoreScreen implements Screen {
 
@@ -24,30 +29,32 @@ public class ScoreScreen implements Screen {
 	private Skin skin;
 	private HorizontalGroup table;
 	private boolean isSignedIn;
+	private Sprite spriteRails;
+	private TrainActorTuto train;
 
 	public ScoreScreen(final EscargotGame game) {
 		this.game = game;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 640, 480);
-		stage = new Stage();
+		camera.setToOrtho(false, 960, 540);
+		stage = new Stage(new StretchViewport(960, 540));
 		Gdx.input.setInputProcessor(stage);
 		table = new HorizontalGroup();
 		table.setFillParent(true);
 		stage.addActor(table);
 
+
 		skin = new Skin();
-		skin.add("retour", new Texture(Gdx.files.internal("back.png")));
-		skin.add("signIn", new Texture(Gdx.files.internal("signIn.png")));
-		skin.add("signOut", new Texture(Gdx.files.internal("signOut.png")));
-		skin.add("achiev", new Texture(Gdx.files.internal("achiev.png")));
-		skin.add("rank", new Texture(Gdx.files.internal("leader.png")));
+		TextureAtlas atlas = game.manager.get("pack.atlas", TextureAtlas.class);
+		skin.addRegions(atlas);
 
 		// Button
-		retour = new Button(skin.getDrawable("retour"));
+		retour = new Button(skin.getDrawable("back"));
 		retour.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.setScreen(game.loadingScreen);
 				dispose();
 			}
@@ -58,6 +65,8 @@ public class ScoreScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.myRequestHandler.beginUserSignIn();
 			}
 		});
@@ -66,6 +75,8 @@ public class ScoreScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				if (game.myRequestHandler.isConnected()) {
 					game.myRequestHandler.signOutUser();
 				}
@@ -77,15 +88,19 @@ public class ScoreScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.myRequestHandler.showAchievments();
 			}
 		});
 		// Button
-		rank = new Button(skin.getDrawable("rank"));
+		rank = new Button(skin.getDrawable("leader"));
 		rank.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.myRequestHandler.classement();
 			}
 		});
@@ -97,6 +112,12 @@ public class ScoreScreen implements Screen {
 		table.addActor(rank);
 		
 		table.bottom();
+		train = new TrainActorTuto(600, 150, 1f,-1,0);
+		train.setTexture(skin.getSprite("train"));
+		stage.addActor(train);
+		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
+		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
+		spriteRails = new Sprite(railsTexture, 4096, 88);
 	}
 
 	@Override
@@ -109,11 +130,11 @@ public class ScoreScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.manager.get("background_0", Texture.class), -512, 0, 1920, 1200);
+		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), -512, 0, 1920, 1200);
 		if (!isSignedIn) {
-			BitmapFont font = game.manager.get("fontVanilla", BitmapFont.class);
+			BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
 			font.draw(game.batch,
-					"Please sign in to Google Play Game", 160, 240, 320,
+					"Please sign in to Google Play Game", 0, 500, 960,
 					Align.center, true);
 			sign_in.setVisible(true);
 			sign_out.setVisible(false);
@@ -128,9 +149,13 @@ public class ScoreScreen implements Screen {
 			rank.setVisible(true);
 			achiev.setVisible(true);
 		}
+
 		game.batch.end();
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
+		game.batch.begin();
+		game.batch.draw(spriteRails, 0, 118, 1920, 32);
+		game.batch.end();
 	}
 
 	@Override

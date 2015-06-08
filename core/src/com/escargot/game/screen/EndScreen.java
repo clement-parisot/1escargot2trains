@@ -3,6 +3,7 @@ package com.escargot.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,11 +13,17 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.escargot.game.EscargotGame;
-import com.escargot.game.Score;
 
 public class EndScreen implements Screen {
 
@@ -27,15 +34,40 @@ public class EndScreen implements Screen {
 	private Skin skin;
 	private HorizontalGroup table;
 
-	public EndScreen(final EscargotGame game, final Score score) {
+	public EndScreen(final EscargotGame game) {
 		this.game = game;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 640, 480);
-		stage = new Stage();
+		camera.setToOrtho(false, 960, 540);
+		stage = new Stage(new StretchViewport(960, 540));
 		Gdx.input.setInputProcessor(stage);
 		table = new HorizontalGroup();
 		table.setFillParent(true);
 		stage.addActor(table);
+		Table t = new Table();
+		t.setFillParent(true);
+		
+		stage.addActor(t);
+		LabelStyle vanillaStyle = new LabelStyle(game.manager.get("vanilla.fnt",BitmapFont.class), Color.WHITE);
+		LabelStyle nashStyle = new LabelStyle(game.manager.get("nashville.fnt",BitmapFont.class), Color.WHITE);
+		Container<Label> gameover = new Container<Label>(new Label(game.bundle.get("gameover"), nashStyle));
+		Container<Label> score_label = new Container<Label>(new Label(game.bundle.get("score"), nashStyle));
+		vanillaStyle.font.setFixedWidthGlyphs(""+game.score_player.toString());
+		Container<Label> score_player = new Container<Label>(new Label(""+game.score_player, vanillaStyle));
+		Container<Label> bestscore = new Container<Label>(new Label(game.bundle.get("bestscore"), nashStyle));
+		vanillaStyle.font.setFixedWidthGlyphs(""+game.score_player.getMaxScore());
+		Container<Label> bestscore_player = new Container<Label>(new Label(""+ game.score_player.getMaxScore(), vanillaStyle));
+		gameover.fillX();
+		Cell<Container<Label>> c = t.add(gameover);
+		c.colspan(2);
+		t.row();
+		t.add(score_label);
+		t.add(score_player);
+		t.row();
+		t.add(bestscore);
+		t.add(bestscore_player);
+		t.pack();
+		t.setPosition(480, 400, Align.center);
+		
 		skin = new Skin();
 		skin.addRegions(game.manager.get("pack.atlas", TextureAtlas.class));
 
@@ -44,6 +76,8 @@ public class EndScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.setScreen(game.loadingScreen);
 			}
 		});
@@ -53,6 +87,8 @@ public class EndScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.myRequestHandler.rateApp();
 			}
 		});
@@ -72,15 +108,8 @@ public class EndScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), -512, 0, 1920, 1200);
-		BitmapFont fontV = game.manager.get("vanilla.fnt", BitmapFont.class);
-		BitmapFont fontN = game.manager.get("nashville.fnt", BitmapFont.class);
-		fontN.draw(game.batch, game.bundle.get("gameover"), 100, 450);
-		fontN.draw(game.batch, game.bundle.get("score"), 100, 350);
-		fontV.draw(game.batch, ""+game.score_player, 200, 250);
-		fontN.draw(game.batch, game.bundle.get("bestscore"), 100, 150);
-		fontV.draw(game.batch, ""+ game.score_player.getMaxScore(), 200, 50);
-		//game.batch.draw(game.tex_escargot, 200, 20, 312, 198);
+		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), 1000, -220, -1920, 1200);
+		game.batch.draw(skin.getRegion("escargot_end"), 224, 20);
 		game.batch.end();
 
 		stage.act(Gdx.graphics.getDeltaTime());

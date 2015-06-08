@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -27,76 +29,68 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.escargot.game.EscargotActor;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Fumee;
-import com.escargot.game.RailActor;
 import com.escargot.game.Score;
 import com.escargot.game.TrainActor;
+import com.escargot.game.tuto.EscargotActorMenu;
 
 public class MainMenuScreen implements Screen {
 	final EscargotGame game;
 	Button but_play, but_score, but_quit;
-	Button but_son_on, but_son_off, but_aide, but_vibre_on, but_vibre_off;
+	Button but_son, but_aide, but_vibre, but_param;
 
 	OrthographicCamera camera;
 	private Stage stage;
 	private Skin skin;
 	private HorizontalGroup main_buttons;
-	private EscargotActor escargot;
+	private EscargotActorMenu escargot;
 	private Array<PooledEffect> effects;
 	private Fumee fumee;
 	private ParticleEffectPool fumeePool;
 	private TrainActor trainG;
 	private TrainActor trainD;
+	private Sprite spriteRails;
+	private Animation animation;
+	private HorizontalGroup menuBar;
 
 	public MainMenuScreen(final EscargotGame game) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 640, 480);
-		stage = new Stage(new StretchViewport(640, 480));
+		camera.setToOrtho(false, 960, 540);
+		stage = new Stage(new StretchViewport(960, 540));
 		main_buttons = new HorizontalGroup();
 		main_buttons.align(Align.center);
-		
+		menuBar = new HorizontalGroup();
+		menuBar.align(Align.bottomRight);
+		stage.addActor(menuBar);
 		stage.addActor(main_buttons);
 
 		skin = new Skin();
 		// Main buttons
-		skin.addRegions(game.manager.get("pack.atlas", TextureAtlas.class));
+		TextureAtlas atlas = game.manager.get("pack.atlas", TextureAtlas.class);
+		skin.addRegions(atlas);
 		
 		// Button
-		but_son_on = new Button(skin.getDrawable("son_on"));
-		but_son_on.addListener(new ChangeListener() {
+		but_son = new Button(skin.getDrawable("son_on"),skin.getDrawable("son_off"),skin.getDrawable("son_off"));
+		but_son.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.son_on = false;
+				EscargotGame.son_on = !but_son.isChecked();
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 			}
 		});
-		but_son_off = new Button(skin.getDrawable("son_off"));
-		but_son_off.addListener(new ChangeListener() {
+		but_vibre = new Button(skin.getDrawable("vibre_on"),skin.getDrawable("vibre_off"),skin.getDrawable("vibre_off"));
+		but_vibre.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.son_on = true;
-			}
-		});
-		but_vibre_on = new Button(skin.getDrawable("vibre_on"));
-		but_vibre_on.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.vibre_on = false;
-			}
-		});
-		but_vibre_off = new Button(skin.getDrawable("vibre_off"));
-		but_vibre_off.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				EscargotGame.vibre_on = true;
-				Gdx.input.vibrate(1000);
+				EscargotGame.vibre_on = !but_vibre.isChecked();
+				if(!but_vibre.isChecked())
+					Gdx.input.vibrate(500);
 			}
 		});
 		but_play = new Button(skin.getDrawable("play"));
@@ -104,7 +98,16 @@ public class MainMenuScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(new GameScreen(game));
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
+				Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+				if (prefs.getBoolean("firstGame", true)) {
+					prefs.putBoolean("firstGame", false);
+					prefs.flush();
+					game.setScreen(new TutorialScreen(game, new Score()));
+				} else {
+					game.setScreen(new GameScreen(game));
+				}
 			}
 		});
 		but_score = new Button(skin.getDrawable("score"));
@@ -112,6 +115,8 @@ public class MainMenuScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				game.setScreen(new ScoreScreen(game));
 			}
 		});
@@ -120,31 +125,64 @@ public class MainMenuScreen implements Screen {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
 				Gdx.app.exit();
 			}
 		});
+		but_param = new Button(skin.getDrawable("param"));
+		but_param.setTransform(true);
+		but_param.setOrigin(Align.center);
+		but_param.addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
+				but_vibre.setVisible(but_param.isChecked());
+				but_son.setVisible(but_param.isChecked());
+				but_param.addAction(Actions.sequence(Actions.rotateBy(180f, 0.5f)));
+			}
+		});
+		but_aide = new Button(skin.getDrawable("aide"));
+		but_aide.addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(EscargotGame.vibre_on)
+					Gdx.input.vibrate(50);
+				game.setScreen(new TutorialScreen(game, new Score()));
+			}
+		});
+		but_aide.setPosition(960, 0, Align.bottomRight);
+		stage.addActor(but_aide);
 		// Add to stage
 		main_buttons.addActor(but_score);
 		main_buttons.addActor(but_play);
 		main_buttons.addActor(but_quit);
+		menuBar.addActor(but_param);
+		menuBar.addActor(but_son);
+		menuBar.addActor(but_vibre);
+		menuBar.pack();
 		
-		escargot = new EscargotActor(320, 140, 0.16f, 0);
-		escargot.setTexture(skin.getSprite("escargot"));
+		escargot = new EscargotActorMenu(480, 145, 0.16f, 1);
+		animation = new Animation(1/15f, atlas.findRegions("escargot"));
+		escargot.setTexture(animation);
 		escargot.addAction(Actions.forever(Actions.sequence(
-				Actions.moveToAligned(200.0f,140.0f,Align.bottomLeft,1.0f,Interpolation.sine),
-                Actions.scaleTo(-1.0f, 1.0f),
-				Actions.moveToAligned(440.0f,140.0f,Align.bottomRight,1.0f,Interpolation.sine), 
-				Actions.scaleTo(1.0f, 1.0f))));
+				Actions.moveToAligned(280.0f,145.0f,Align.bottomLeft,1.6f,Interpolation.sine),
+                Actions.scaleTo(-1f, 1f),
+				Actions.moveToAligned(680.0f,145.0f,Align.bottomRight,1.6f,Interpolation.sine), 
+				Actions.scaleTo(1f, 1f))));
 		stage.addActor(escargot);
-		trainG = new TrainActor(200,140,0.5f,-1,0);
+		trainG = new TrainActor(280,145,0.5f,-1,0);
 		trainG.setTexture(skin.getSprite("train"));
 		stage.addActor(trainG);
-		trainD = new TrainActor(440,140,0.5f,1,0);
+		trainD = new TrainActor(680,145,0.5f,1,0);
 		trainD.setTexture(skin.getSprite("train"));
 		stage.addActor(trainD);
-		RailActor rails = new RailActor();
-		rails.setTexture(skin.getSprite("rails"));
-		stage.addActor(rails);
+		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
+		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
+		spriteRails = new Sprite(railsTexture, 4096, 88);
 		stage.act(1);
 		
 		effects = new Array<PooledEffect>();
@@ -158,7 +196,7 @@ public class MainMenuScreen implements Screen {
 		effects.add(effect2);
 
 		main_buttons.pack();
-		main_buttons.setPosition(320, 0, Align.bottom+Align.center);
+		main_buttons.setPosition(480, 0, Align.bottom+Align.center);
 		// Pub
 		game.myRequestHandler.showAds(true);
 		Table t = new Table();
@@ -186,7 +224,10 @@ public class MainMenuScreen implements Screen {
 		t.add(lab_2);
 		t.add(lab_trains);
 		t.pack();
-		t.setPosition(320, 420, Align.top+Align.center);
+		t.setPosition(480, 500, Align.top+Align.center);
+		main_buttons.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
+		menuBar.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
+		but_aide.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
 	}
 
 	@Override
@@ -198,36 +239,21 @@ public class MainMenuScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 
 		game.batch.begin();
-		game.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
+		game.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 960, 540);
+
+
+		game.batch.end();
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
+		game.batch.begin();
+		game.batch.enableBlending();
+		game.batch.draw(spriteRails, 0, 115, 960, 32);
 		// Update and draw effects:
 		for (int i = effects.size - 1; i >= 0; i--) {
 			PooledEffect effect = effects.get(i);
 			effect.draw(game.batch, delta);
 		}
-
 		game.batch.end();
-		but_son_on.setVisible(EscargotGame.son_on);
-		but_son_off.setVisible(!EscargotGame.son_on);
-		but_vibre_on.setVisible(EscargotGame.vibre_on);
-		but_vibre_off.setVisible(!EscargotGame.vibre_on);
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
-
-		if (Gdx.input.justTouched()) {
-			Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),
-					0);
-			camera.unproject(touchPos);
-			if (touchPos.y > 70) {
-				Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
-				if (prefs.getBoolean("firstGame", true)) {
-					prefs.putBoolean("firstGame", false);
-					prefs.flush();
-					game.setScreen(new TutorialScreen(game, new Score()));
-				} else {
-					game.setScreen(new TutorialScreen(game,new Score()));
-				}
-			}
-		}
 	}
 
 	@Override
@@ -239,10 +265,8 @@ public class MainMenuScreen implements Screen {
 	public void show() {
 		game.myRequestHandler.showAds(true);
 		Gdx.input.setInputProcessor(stage);
-		but_son_on.setVisible(EscargotGame.son_on);
-		but_son_off.setVisible(!EscargotGame.son_on);
-		but_vibre_on.setVisible(EscargotGame.vibre_on);
-		but_vibre_off.setVisible(!EscargotGame.vibre_on);
+		but_son.setVisible(false);
+		but_vibre.setVisible(false);
 	}
 
 	@Override

@@ -11,8 +11,8 @@ public class DesktopLauncher implements IActivityRequestHandler {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Escargot";
-		config.width = 640;
-		config.height = 480;
+		config.width = 960;
+		config.height = 540;
 		if (application == null) {
 			application = new DesktopLauncher();
 		}
