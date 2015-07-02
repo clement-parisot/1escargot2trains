@@ -15,12 +15,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -34,13 +37,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Fumee;
+import com.escargot.game.RessourcesManager;
 import com.escargot.game.Score;
 import com.escargot.game.tuto.EscargotActorTuto;
 import com.escargot.game.tuto.TrainActorTuto;
 
 public class TutorialScreen implements Screen {
-	final EscargotGame game;
-
 	OrthographicCamera cameraGame;
 	private Stage stage;
 	private Skin skin;
@@ -89,8 +91,17 @@ public class TutorialScreen implements Screen {
 
 	private PooledEffect mortEffect;
 
-	public TutorialScreen(final EscargotGame game, Score score) {
-		this.game = game;
+	private Batch batch;
+
+	private ShapeRenderer sr;
+	private boolean pause;
+	private BitmapFont fontNash;
+	private CharSequence help;
+	private BitmapFont fontVani;
+
+	public TutorialScreen() {
+		batch = new SpriteBatch();
+		sr = new ShapeRenderer();
 		Gdx.input.setCatchBackKey(true);
 		stage = new Stage(new StretchViewport(1920, 1080)){
 			@Override
@@ -98,22 +109,21 @@ public class TutorialScreen implements Screen {
 				if(keycode == Keys.BACK || keycode == Keys.ESCAPE){
 					Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 					if (!prefs.getBoolean("firstGame", true)) {
-						game.setScreen(game.loadingScreen);
-						dispose();
+						ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 					}
 					return false;
 				}
 				if(step0_displayText){
-					game.resume();
+					resume();
 					step0_displayText = false;
 				}
 				if(step2_displayScore){
-					game.resume();
+					resume();
 					step2_5_wait = true;
 					step2_displayScore = false;
 				}
 				if(step3_displayLeft){
-					game.resume();
+					resume();
 					step4_displaySante = true;
 					step3_displayLeft = false;
 				}
@@ -128,7 +138,7 @@ public class TutorialScreen implements Screen {
 					escargot.setVitesse(1.2);
 					escargot.flip(640);
 					if(step1_displayRight){
-						game.resume();
+						resume();
 						step1_5_wait = true;
 						step1_displayRight = false;
 					}
@@ -146,7 +156,6 @@ public class TutorialScreen implements Screen {
 		};
 		score_game = new Score();
 
-		
 		// Tout l'ecran de jeu (1920/1080)
 		cameraGame = (OrthographicCamera) stage.getCamera();
 		cameraGame.setToOrtho(false, 1920, 1080);
@@ -154,16 +163,16 @@ public class TutorialScreen implements Screen {
 		cameraScore.setToOrtho(false, 960, 540);
 		
 		// Sons
-		music_bg = Gdx.audio.newMusic(Gdx.files.internal("sound0.mp3"));
-		sound_train = Gdx.audio.newSound(Gdx.files.internal("sound2.wav"));
-		sound_mort = Gdx.audio.newSound(Gdx.files.internal("sound1.wav"));
+		music_bg = RessourcesManager.getInstance().getMusic("sound0.mp3");
+		sound_train = RessourcesManager.getInstance().getSound("sound2.wav");
+		sound_mort = RessourcesManager.getInstance().getSound("sound1.wav");
 
 		// Musique en boucle
 		music_bg.setLooping(true);
 
 		skin = new Skin();
 		// Load textures
-		TextureAtlas atlas =  game.manager.get("pack.atlas", TextureAtlas.class);
+		TextureAtlas atlas =  RessourcesManager.getInstance().getAtlas("pack.atlas");
 		skin.addRegions(atlas);
 		
 		escargot = new EscargotActorTuto(0, 145, 0.16f, 0.6);
@@ -184,10 +193,10 @@ public class TutorialScreen implements Screen {
 		
 		effects = new Array<PooledEffect>();
 		mort = new ParticleEffect();
-		mort.load(Gdx.files.internal("escargot"), game.manager.get("pack.atlas", TextureAtlas.class));
+		mort.load(Gdx.files.internal("escargot"), atlas);
 		mortPool = new ParticleEffectPool(mort, 1, 2);
 		mortEffect = mortPool.obtain();
-		fumee = new Fumee(game);
+		fumee = new Fumee();
 		fumeePool = new ParticleEffectPool(fumee, 1, 2);
 		PooledEffect effect = fumeePool.obtain();
 		effect.setPosition(trainG.getFumX(), trainG.getFumY());
@@ -202,7 +211,7 @@ public class TutorialScreen implements Screen {
 				if(step1_displayRight){
 					step1_5_wait = true;
 					step1_displayRight = false;
-					game.resume();
+					resume();
 				}
 				if (!step1_displayRight && !step1_5_wait && !step2_displayScore && !step2_5_wait && ! step3_displayLeft && !step4_displaySante)
 					return true;
@@ -214,16 +223,16 @@ public class TutorialScreen implements Screen {
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				if(step0_displayText){
-					game.resume();
+					resume();
 					step0_displayText = false;
 				}
 				if(step2_displayScore){
-					game.resume();
+					resume();
 					step2_5_wait = true;
 					step2_displayScore = false;
 				}
 				if(step3_displayLeft){
-					game.resume();
+					resume();
 					step4_displaySante = true;
 					step3_displayLeft = false;
 				}
@@ -244,11 +253,11 @@ public class TutorialScreen implements Screen {
 		});
 		
 		// Pub
-		game.myRequestHandler.showAds(false);
-		Texture bgdTexture = game.manager.get("background_0.jpg",Texture.class);
+		EscargotGame.myRequestHandler.showAds(false);
+		Texture bgdTexture = RessourcesManager.getInstance().getTexture("background_0.jpg");
 		bgdTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteBgd = new Sprite(bgdTexture, 0, 0, 1920, 1080);
-		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
+		Texture railsTexture = RessourcesManager.getInstance().getTexture("rails_0.png");
 		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteRails = new Sprite(railsTexture, 4096, 88);
 		
@@ -257,6 +266,9 @@ public class TutorialScreen implements Screen {
 		
 		blinkerLeft = new Blinker();
 		blinkerLeft.setBlinking(true);
+		fontNash = RessourcesManager.getInstance().getFont("nashville.fnt");
+		fontVani = RessourcesManager.getInstance().getFont("vanilla.fnt");
+		help = RessourcesManager.getInstance().getBundle().get("help");
 	}
 	
 	private void camera_zoom(float dist, Vector2 posEscargot) {
@@ -288,9 +300,9 @@ public class TutorialScreen implements Screen {
 		camera_zoom(Math.min(Math.abs(distg), Math.abs(distd))/700, new Vector2(escargot.getX(Align.center), escargot.getY(Align.center)));
 		cameraGame.update();
 		cameraScore.update();
-		game.batch.begin();
-		game.batch.setProjectionMatrix(cameraGame.combined);
-		//game.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
+		this.batch.begin();
+		this.batch.setProjectionMatrix(cameraGame.combined);
+		//this.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
 		scrollTimer+=Gdx.graphics.getDeltaTime()*0.1f;
 		if(scrollTimer>2.0f)
 			scrollTimer = 0.0f;
@@ -299,104 +311,102 @@ public class TutorialScreen implements Screen {
 		//	     spriteBgd.setU2(scrollTimer+1);
 		//	     spriteRails.setU(scrollTimer);
 		//	     spriteRails.setU2(scrollTimer+1);
-		game.batch.draw(spriteBgd, 0, 0, 1920, 1080);
-		game.batch.end();
+		this.batch.draw(spriteBgd, 0, 0, 1920, 1080);
+		this.batch.end();
 		stage.draw();
-		game.batch.begin();
-		game.batch.draw(spriteRails, 0, 118, 1920, 32);
+		this.batch.begin();
+		this.batch.draw(spriteRails, 0, 118, 1920, 32);
 		// Update and draw effects:
 		effects.get(0).setPosition(trainG.getFumX(), trainG.getFumY());
 		effects.get(1).setPosition(trainD.getFumX(), trainD.getFumY());
-		game.batch.end();
-		if(!game.pause){
+		this.batch.end();
+		if(!this.pause){
 			stage.act(Gdx.graphics.getDeltaTime());
 			score_update(dist, delta);
 		}
 		
 		if(!step1_displayRight && dist > 0.05 && !step1_5_wait && !step2_displayScore && !step2_5_wait && ! step3_displayLeft && !step4_displaySante){
 			step1_displayRight = true;
-			game.pause();
+			pause();
 		}
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		game.sr.setProjectionMatrix(cameraScore.combined);
-		game.sr.begin(ShapeType.Filled);
+		this.sr.setProjectionMatrix(cameraScore.combined);
+		this.sr.begin(ShapeType.Filled);
 		
 		if(faster && escargot.getDirection() == 1){
-			game.sr.rect(960, 0, -240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
+			this.sr.rect(960, 0, -240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
 		}
 		if(step2_displayScore|| step3_displayLeft || step4_displaySante){
 		}
 		if((step3_displayLeft  || step4_displaySante) && faster && escargot.getDirection() == -1){
-			game.sr.rect(0, 0, 240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
+			this.sr.rect(0, 0, 240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
 		}
 		if(step4_displaySante){
-			game.sr.rect(240, 0, 480, 40, Color.RED, Color.GREEN, Color.GREEN, Color.RED);
-			game.sr.setColor(0,0,0,1);
-			game.sr.rect(720, 0, Math.min(Math.max(-1*Math.round((dist)*480/48)*48, -480), 0), 40);
-			game.sr.end();
-			game.sr.begin(ShapeType.Line);
-			game.sr.setColor(0,0,0,1);
+			this.sr.rect(240, 0, 480, 40, Color.RED, Color.GREEN, Color.GREEN, Color.RED);
+			this.sr.setColor(0,0,0,1);
+			this.sr.rect(720, 0, Math.min(Math.max(-1*Math.round((dist)*480/48)*48, -480), 0), 40);
+			this.sr.end();
+			this.sr.begin(ShapeType.Line);
+			this.sr.setColor(0,0,0,1);
 			for(int i = 0; i <= 480; i+=48){
-				game.sr.rect(240, 0, i, 40);
+				this.sr.rect(240, 0, i, 40);
 			}
 		}
-		game.sr.end();
-		game.batch.begin();
+		this.sr.end();
+		this.batch.begin();
 		for (int i = effects.size - 1; i >= 0; i--) {
 			PooledEffect effect = effects.get(i);
-			if(!game.pause)
-				effect.draw(game.batch, delta);
+			if(!this.pause)
+				effect.draw(this.batch, delta);
 			else
-				effect.draw(game.batch);
+				effect.draw(this.batch);
 		}
 		if (end) {
-			mortEffect.draw(game.batch, delta);
+			mortEffect.draw(this.batch, delta);
 			if (mortEffect.isComplete()) {
 				end_game();
 			}
 		}
-		game.batch.setProjectionMatrix(cameraScore.combined);
+		this.batch.setProjectionMatrix(cameraScore.combined);
 		// Step0
 		if(step0_displayText){
-			BitmapFont font = game.manager.get("nashville.fnt", BitmapFont.class);
-			font.draw(game.batch, game.bundle.get("help"), 0, 540, 960, Align.left, true);
-			game.pause();
+			fontNash.draw(this.batch, help, 0, 540, 960, Align.left, true);
+			pause();
 		}
 		if(step1_displayRight || step1_5_wait || step2_displayScore || step2_5_wait || step3_displayLeft || step4_displaySante){
 			if(faster && escargot.getDirection() == 1){
-				game.batch.draw(skin.getSprite("fastRight"), 832, 270);
+				this.batch.draw(skin.getSprite("fastRight"), 832, 270);
 			}
 			else{
 				if(!step1_displayRight || !blinkerRight.shouldBlink(delta))
-					game.batch.draw(skin.getSprite("right"), 832, 270);
+					this.batch.draw(skin.getSprite("right"), 832, 270);
 			}
 		}
 		if(step1_5_wait && distd < 1000){
-			game.pause();
+			pause();
 			step2_displayScore = true;
 			step1_5_wait = false;
 		}
 		if(step2_displayScore|| step2_5_wait || step3_displayLeft || step4_displaySante){
-			BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
-			font.setFixedWidthGlyphs(score_game.toString());
-			font.draw(game.batch, score_game.toString(), 240, 535, 480, Align.center, false);
+			fontVani.setFixedWidthGlyphs(score_game.toString());
+			fontVani.draw(this.batch, score_game.toString(), 240, 535, 480, Align.center, false);
 		}
 		if(step2_5_wait && distd < distg){
-			game.pause();
+			pause();
 			step3_displayLeft = true;
 			step2_5_wait = false;
 		}
 		if(step3_displayLeft || step4_displaySante){	
 			if(faster && escargot.getDirection() == -1)
-				game.batch.draw(skin.getSprite("fastLeft"), 64, 270);
+				this.batch.draw(skin.getSprite("fastLeft"), 64, 270);
 			else
 				if(!step3_displayLeft || !blinkerLeft.shouldBlink(delta))
-					game.batch.draw(skin.getSprite("left"), 64, 270);
+					this.batch.draw(skin.getSprite("left"), 64, 270);
 
 		}
 		if(step4_displaySante){
 		}
-		game.batch.end();
+		this.batch.end();
 		
 		if(!end){
 			if(distg <= 0 || distd <= 0){
@@ -415,8 +425,7 @@ public class TutorialScreen implements Screen {
 	}
 
 	private void end_game() {
-		game.setScreen(game.endScreen);
-		dispose();
+		ScreenManager.getInstance().show(ScreenName.END);
 	}
 	
 	private void score_update(float dist, float delta) {
@@ -431,47 +440,47 @@ public class TutorialScreen implements Screen {
 	
 	@Override
 	public void show() {
+		RessourcesManager.getInstance().finishLoad();
+		pause = false;
 		if (EscargotGame.son_on) {
-			//sound_train.play();
-			//music_bg.play();
+			sound_train.play();
+			music_bg.play();
 		}
-		game.myRequestHandler.showAds(false);
+		EscargotGame.myRequestHandler.showAds(false);
 		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void hide() {
-		game.myRequestHandler.showAds(false);
+		EscargotGame.myRequestHandler.showAds(false);
 		sound_train.stop();
 		music_bg.stop();
 	}
 
 	@Override
 	public void pause() {
-		game.pause = true;
+		pause = true;
 		sound_train.stop();
 		music_bg.stop();
 	}
 
 	@Override
 	public void resume() {
-		if (EscargotGame.son_on) {
-			//sound_train.play();
-			//music_bg.play();
-		}
-		game.pause = false;
+		RessourcesManager.getInstance().finishLoad();
+		pause = false;
 	}
 
 	@Override
 	public void dispose() {
-		music_bg.dispose();
-		sound_train.dispose();
-		sound_mort.dispose();
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		prefs.putBoolean("tutorial", true);
 		prefs.flush();
+		mort.dispose();
+		fumee.dispose();
 		stage.dispose();
 		skin.dispose();
+		batch.dispose();
+		sr.dispose();
 	}
 	
 	public class Blinker {

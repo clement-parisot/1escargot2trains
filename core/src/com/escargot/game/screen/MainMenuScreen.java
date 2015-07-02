@@ -9,10 +9,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -31,12 +32,11 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Fumee;
-import com.escargot.game.Score;
+import com.escargot.game.RessourcesManager;
 import com.escargot.game.TrainActor;
 import com.escargot.game.tuto.EscargotActorMenu;
 
 public class MainMenuScreen implements Screen {
-	final EscargotGame game;
 	Button but_play, but_score, but_quit;
 	Button but_son, but_aide, but_vibre, but_param;
 
@@ -53,9 +53,11 @@ public class MainMenuScreen implements Screen {
 	private Sprite spriteRails;
 	private Animation animation;
 	private HorizontalGroup menuBar;
+	private Batch batch;
+	private Texture bgd_tex;
 
-	public MainMenuScreen(final EscargotGame game) {
-		this.game = game;
+	public MainMenuScreen() {
+		batch = new SpriteBatch();
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 960, 540);
@@ -69,7 +71,7 @@ public class MainMenuScreen implements Screen {
 
 		skin = new Skin();
 		// Main buttons
-		TextureAtlas atlas = game.manager.get("pack.atlas", TextureAtlas.class);
+		TextureAtlas atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
 		skin.addRegions(atlas);
 		
 		// Button
@@ -104,9 +106,9 @@ public class MainMenuScreen implements Screen {
 				if (prefs.getBoolean("firstGame", true)) {
 					prefs.putBoolean("firstGame", false);
 					prefs.flush();
-					game.setScreen(new TutorialScreen(game, new Score()));
+					ScreenManager.getInstance().show(ScreenName.TUTO);
 				} else {
-					game.setScreen(new GameScreen(game));
+					ScreenManager.getInstance().show(ScreenName.GAME);
 				}
 			}
 		});
@@ -117,7 +119,7 @@ public class MainMenuScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				game.setScreen(new ScoreScreen(game));
+				ScreenManager.getInstance().show(ScreenName.SCORE);
 			}
 		});
 		but_quit = new Button(skin.getDrawable("signOut"));
@@ -151,7 +153,7 @@ public class MainMenuScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				game.setScreen(new TutorialScreen(game, new Score()));
+					ScreenManager.getInstance().show(ScreenName.TUTO);
 			}
 		});
 		but_aide.setPosition(960, 0, Align.bottomRight);
@@ -186,7 +188,7 @@ public class MainMenuScreen implements Screen {
 		stage.act(1);
 		
 		effects = new Array<PooledEffect>();
-		fumee = new Fumee(game);
+		fumee = new Fumee();
 		fumeePool = new ParticleEffectPool(fumee, 1, 2);
 		PooledEffect effect = fumeePool.obtain();
 		effect.setPosition(trainG.getFumX(), trainG.getFumY());
@@ -198,18 +200,18 @@ public class MainMenuScreen implements Screen {
 		main_buttons.pack();
 		main_buttons.setPosition(480, 0, Align.bottom+Align.center);
 		// Pub
-		game.myRequestHandler.showAds(true);
+		EscargotGame.myRequestHandler.showAds(true);
 		Table t = new Table();
 		
 		t.defaults().pad(10);
 		stage.addActor(t);
 		//t.setFillParent(true);
-		LabelStyle vanillaStyle = new LabelStyle(game.manager.get("vanilla.fnt",BitmapFont.class), Color.WHITE);
-		LabelStyle nashStyle = new LabelStyle(game.manager.get("nashville.fnt",BitmapFont.class), Color.WHITE);
+		LabelStyle vanillaStyle = new LabelStyle(RessourcesManager.getInstance().getFont("vanilla.fnt"), Color.WHITE);
+		LabelStyle nashStyle = new LabelStyle(RessourcesManager.getInstance().getFont("nashville.fnt"), Color.WHITE);
 		Container<Label> lab_1 = new Container<Label>(new Label("1", vanillaStyle));
 		Container<Label> lab_2 = new Container<Label>(new Label("2", vanillaStyle));
-		Container<Label> lab_escargot = new Container<Label>(new Label(game.bundle.get("snail"), nashStyle));
-		Container<Label> lab_trains = new Container<Label>(new Label(game.bundle.get("trains"), nashStyle));
+		Container<Label> lab_escargot = new Container<Label>(new Label(RessourcesManager.getInstance().getBundle().get("snail"), nashStyle));
+		Container<Label> lab_trains = new Container<Label>(new Label(RessourcesManager.getInstance().getBundle().get("trains"), nashStyle));
 		lab_1.setTransform(true);
 		lab_1.addAction(Actions.sequence(Actions.scaleTo(0.5f, 0.0f),Actions.scaleTo(1.00f, 1.00f,0.5f)));
 		lab_escargot.setTransform(true);
@@ -228,6 +230,7 @@ public class MainMenuScreen implements Screen {
 		main_buttons.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
 		menuBar.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
 		but_aide.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
+		bgd_tex = RessourcesManager.getInstance().getTexture("background_0.jpg");
 	}
 
 	@Override
@@ -236,24 +239,24 @@ public class MainMenuScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		camera.update();
-		game.batch.setProjectionMatrix(camera.combined);
+		this.batch.setProjectionMatrix(camera.combined);
 
-		game.batch.begin();
-		game.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 960, 540);
+		this.batch.begin();
+		this.batch.draw(bgd_tex, 0, 0, 960, 540);
 
 
-		game.batch.end();
+		this.batch.end();
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
-		game.batch.begin();
-		game.batch.enableBlending();
-		game.batch.draw(spriteRails, 0, 115, 960, 32);
+		this.batch.begin();
+		this.batch.enableBlending();
+		this.batch.draw(spriteRails, 0, 115, 960, 32);
 		// Update and draw effects:
 		for (int i = effects.size - 1; i >= 0; i--) {
 			PooledEffect effect = effects.get(i);
-			effect.draw(game.batch, delta);
+			effect.draw(this.batch, delta);
 		}
-		game.batch.end();
+		this.batch.end();
 	}
 
 	@Override
@@ -263,7 +266,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
-		game.myRequestHandler.showAds(true);
+		EscargotGame.myRequestHandler.showAds(true);
 		Gdx.input.setInputProcessor(stage);
 		but_son.setVisible(false);
 		but_vibre.setVisible(false);
@@ -271,7 +274,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void hide() {
-		game.myRequestHandler.showAds(false);
+		EscargotGame.myRequestHandler.showAds(false);
 	}
 
 	@Override
@@ -280,6 +283,8 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void resume() {
+		ScreenManager.getInstance().dispose(ScreenName.MAIN_MENU);
+		ScreenManager.getInstance().show(ScreenName.LOADING);
 	}
 
 	@Override
@@ -288,7 +293,9 @@ public class MainMenuScreen implements Screen {
 		prefs.putBoolean("son_on", EscargotGame.son_on);
 		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
 		prefs.flush();
+		fumee.dispose();
 		stage.dispose();
 		skin.dispose();
+		batch.dispose();
 	}
 }

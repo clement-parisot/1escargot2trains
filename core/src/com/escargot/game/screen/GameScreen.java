@@ -14,12 +14,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -33,12 +36,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Fumee;
-import com.escargot.game.Score;
+import com.escargot.game.RessourcesManager;
 import com.escargot.game.tuto.EscargotActorTuto;
 import com.escargot.game.tuto.TrainActorTuto;
 
 public class GameScreen implements Screen {
-	final EscargotGame game;
 
 	OrthographicCamera cameraGame;
 	private Stage stage;
@@ -75,9 +77,19 @@ public class GameScreen implements Screen {
 	private ParticleEffectPool mortPool;
 
 	private PooledEffect mortEffect;
+	
+	private Batch batch;
+	
+	private ShapeRenderer sr;
+	private boolean pause;
+	private BitmapFont fontVani;
 
-	public GameScreen(final EscargotGame game) {
-		this.game = game;
+	public GameScreen() {
+		EscargotGame.myRequestHandler.showAds(false);
+		EscargotGame.score_player.resetScore();
+		end = false;
+		batch = new SpriteBatch();
+		sr = new ShapeRenderer();
 		stage = new Stage(new StretchViewport(1920, 1080)){
 			@Override
 			public boolean keyDown(int keycode) {
@@ -103,7 +115,6 @@ public class GameScreen implements Screen {
 				return true;
 			}
 		};
-		game.score_player.resetScore();
 		
 		// Tout l'ecran de jeu (1920/1080)
 		cameraGame = (OrthographicCamera) stage.getCamera();
@@ -112,16 +123,16 @@ public class GameScreen implements Screen {
 		cameraScore.setToOrtho(false, 960, 540);
 		
 		// Sons
-		music_bg = Gdx.audio.newMusic(Gdx.files.internal("sound0.mp3"));
-		sound_train = Gdx.audio.newSound(Gdx.files.internal("sound2.wav"));
-		sound_mort = Gdx.audio.newSound(Gdx.files.internal("sound1.wav"));
+		music_bg = RessourcesManager.getInstance().getMusic("sound0.mp3");
+		sound_train = RessourcesManager.getInstance().getSound("sound2.wav");
+		sound_mort = RessourcesManager.getInstance().getSound("sound1.wav");
 
 		// Musique en boucle
 		music_bg.setLooping(true);
 
 		skin = new Skin();
 		// Load textures
-		TextureAtlas atlas =  game.manager.get("pack.atlas", TextureAtlas.class);
+		TextureAtlas atlas =  RessourcesManager.getInstance().getAtlas("pack.atlas");
 		skin.addRegions(atlas);
 		
 		escargot = new EscargotActorTuto(0, 145, 0.16f, 0.6);
@@ -142,10 +153,10 @@ public class GameScreen implements Screen {
 		
 		effects = new Array<PooledEffect>();
 		mort = new ParticleEffect();
-		mort.load(Gdx.files.internal("escargot"), game.manager.get("pack.atlas", TextureAtlas.class));
+		mort.load(Gdx.files.internal("escargot"), atlas);
 		mortPool = new ParticleEffectPool(mort, 1, 2);
 		mortEffect = mortPool.obtain();
-		fumee = new Fumee(game);
+		fumee = new Fumee();
 		fumeePool = new ParticleEffectPool(fumee, 1, 2);
 		PooledEffect effect = fumeePool.obtain();
 		effect.setPosition(trainG.getFumX(), trainG.getFumY());
@@ -177,14 +188,13 @@ public class GameScreen implements Screen {
 			}
 		});
 		
-		// Pub
-		game.myRequestHandler.showAds(false);
-		Texture bgdTexture = game.manager.get("background_0.jpg",Texture.class);
+		Texture bgdTexture = RessourcesManager.getInstance().getTexture("background_0.jpg");
 		bgdTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteBgd = new Sprite(bgdTexture, 0, 0, 1920, 1080);
 		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
 		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteRails = new Sprite(railsTexture, 4096, 88);
+		fontVani = RessourcesManager.getInstance().getFont("vanilla.fnt");
 	}
 	
 	private void camera_zoom(float dist, Vector2 posEscargot) {
@@ -229,9 +239,9 @@ public class GameScreen implements Screen {
 		camera_zoom(Math.min(Math.abs(distg), Math.abs(distd))/700, new Vector2(escargot.getX(Align.center), escargot.getY(Align.center)));
 		cameraGame.update();
 		cameraScore.update();
-		game.batch.begin();
-		game.batch.setProjectionMatrix(cameraGame.combined);
-		//game.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
+		this.batch.begin();
+		this.batch.setProjectionMatrix(cameraGame.combined);
+		//this.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
 		scrollTimer+=Gdx.graphics.getDeltaTime()*0.1f;
 		if(scrollTimer>2.0f)
 			scrollTimer = 0.0f;
@@ -240,85 +250,82 @@ public class GameScreen implements Screen {
 		//	     spriteBgd.setU2(scrollTimer+1);
 		//	     spriteRails.setU(scrollTimer);
 		//	     spriteRails.setU2(scrollTimer+1);
-		game.batch.draw(spriteBgd, 0, 0, 1920, 1080);
-		game.batch.end();
+		this.batch.draw(spriteBgd, 0, 0, 1920, 1080);
+		this.batch.end();
 		stage.draw();
-		game.batch.begin();
-		game.batch.draw(spriteRails, 0, 118, 1920, 32);
+		this.batch.begin();
+		this.batch.draw(spriteRails, 0, 118, 1920, 32);
 		// Update and draw effects:
 		effects.get(0).setPosition(trainG.getFumX(), trainG.getFumY());
 		effects.get(1).setPosition(trainD.getFumX(), trainD.getFumY());
-		game.batch.end();
-		if(!game.pause){
+		this.batch.end();
+		if(!pause){
 			stage.act(Gdx.graphics.getDeltaTime());
 			score_update(dist, delta);
 		}
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		game.sr.setProjectionMatrix(cameraScore.combined);
-		game.sr.begin(ShapeType.Filled);
+		this.sr.setProjectionMatrix(cameraScore.combined);
+		this.sr.begin(ShapeType.Filled);
 		
 		if(faster && escargot.getDirection() == 1){
-			game.sr.rect(960, 0, -240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
+			this.sr.rect(960, 0, -240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
 		}
 		if(faster && escargot.getDirection() == -1){
-			game.sr.rect(0, 0, 240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
+			this.sr.rect(0, 0, 240, 540, new Color(0, 1, 0, 0.5f), new Color(0, 1, 0, 0f), new Color(0, 1, 0, 0), new Color(0, 1, 0, 0.5f));
 		}
-		game.sr.rect(240, 0, 480, 40, Color.RED, Color.GREEN, Color.GREEN, Color.RED);
-		game.sr.setColor(0,0,0,1);
-		game.sr.rect(720, 0, Math.min(Math.max(-1*Math.round((dist)*480/48)*48, -480), 0), 40);
-		game.sr.end();
-		game.sr.begin(ShapeType.Line);
-		game.sr.setColor(0,0,0,1);
+		this.sr.rect(240, 0, 480, 40, Color.RED, Color.GREEN, Color.GREEN, Color.RED);
+		this.sr.setColor(0,0,0,1);
+		this.sr.rect(720, 0, Math.min(Math.max(-1*Math.round((dist)*480/48)*48, -480), 0), 40);
+		this.sr.end();
+		this.sr.begin(ShapeType.Line);
+		this.sr.setColor(0,0,0,1);
 		for(int i = 0; i <= 480; i+=48){
-			game.sr.rect(240, 0, i, 40);
+			this.sr.rect(240, 0, i, 40);
 		}
-		game.sr.end();
-		game.batch.begin();
+		this.sr.end();
+		this.batch.begin();
 		for (int i = effects.size - 1; i >= 0; i--) {
 			PooledEffect effect = effects.get(i);
-			if(!game.pause)
-				effect.draw(game.batch, delta);
+			if(!pause)
+				effect.draw(this.batch, delta);
 			else
-				effect.draw(game.batch);
+				effect.draw(this.batch);
 		}
 		if (end) {
-			mortEffect.draw(game.batch, delta);
+			mortEffect.draw(this.batch, delta);
 			if (mortEffect.isComplete()) {
 				end_game();
 			}
 		}
-		game.batch.setProjectionMatrix(cameraScore.combined);
+		this.batch.setProjectionMatrix(cameraScore.combined);
 
 		if(faster && escargot.getDirection() == 1){
-			game.batch.draw(skin.getSprite("fastRight"), 832, 270);
+			this.batch.draw(skin.getSprite("fastRight"), 832, 270);
 		}
 		else{
-			game.batch.draw(skin.getSprite("right"), 832, 270);
+			this.batch.draw(skin.getSprite("right"), 832, 270);
 		}
 		
-		BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
-		font.setFixedWidthGlyphs(game.score_player.toString());
-		font.draw(game.batch, game.score_player.toString(), 240, 535, 480, Align.center, false);
+		fontVani.setFixedWidthGlyphs(EscargotGame.score_player.toString());
+		fontVani.draw(this.batch, EscargotGame.score_player.toString(), 240, 535, 480, Align.center, false);
 
 		if(faster && escargot.getDirection() == -1)
-			game.batch.draw(skin.getSprite("fastLeft"), 64, 270);
+			this.batch.draw(skin.getSprite("fastLeft"), 64, 270);
 		else
-			game.batch.draw(skin.getSprite("left"), 64, 270);
+			this.batch.draw(skin.getSprite("left"), 64, 270);
 
-		game.batch.end();
+		this.batch.end();
 	}
 
 	private void end_game() {
-		game.score_player.updateBestScore();
-		game.endScreen = new EndScreen(game);
-		game.setScreen(game.endScreen);
-		dispose();
+		EscargotGame.score_player.updateBestScore();
+		ScreenManager.getInstance().show(ScreenName.END);
 	}
 	
 	private void score_update(float dist, float delta) {
 		if(!end){
 			double pas = Math.pow(2, Math.round(Math.max(Math.min((1-dist), 1),0)*10));
-			game.score_player.setScore(pas * delta);
+			EscargotGame.score_player.setScore(pas * delta);
 		}
 	}
 
@@ -329,43 +336,42 @@ public class GameScreen implements Screen {
 	
 	@Override
 	public void show() {
+		RessourcesManager.getInstance().finishLoad();
+		pause = false;
 		if (EscargotGame.son_on) {
 			sound_train.play();
 			music_bg.play();
 		}
-		game.myRequestHandler.showAds(false);
 		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void hide() {
-		game.myRequestHandler.showAds(false);
+		EscargotGame.myRequestHandler.showAds(false);
 		sound_train.stop();
 		music_bg.stop();
 	}
 
 	@Override
 	public void pause() {
-		game.pause = true;
+		pause = true;
 		sound_train.stop();
 		music_bg.stop();
 	}
 
 	@Override
 	public void resume() {
-		if (EscargotGame.son_on) {
-			sound_train.play();
-			music_bg.play();
-		}
-		game.pause = false;
+		RessourcesManager.getInstance().finishLoad();
+		pause = false;
 	}
 
 	@Override
 	public void dispose() {
-		music_bg.dispose();
-		sound_train.dispose();
-		sound_mort.dispose();
+		mort.dispose();
+		fumee.dispose();
 		stage.dispose();
 		skin.dispose();
+		batch.dispose();
+		sr.dispose();
 	}
 }

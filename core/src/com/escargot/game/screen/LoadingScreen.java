@@ -12,14 +12,13 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.I18NBundle;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.RessourcesManager;
 
 /**
  * @author Mats Svensson
  */
 public class LoadingScreen implements Screen {
-	final EscargotGame game;
 	   private Stage stage;
 
 	    private Image logo;
@@ -32,27 +31,26 @@ public class LoadingScreen implements Screen {
 	    private float percent;
 
 	    private Actor loadingBar;
-		private AssetManager manager;
+		private AssetManager loader_manager;
 
-	    public LoadingScreen(EscargotGame game) {
+	    public LoadingScreen() {
 	        super();
-	        this.game = game;
-	        game.myRequestHandler.showAds(false);
+	        EscargotGame.myRequestHandler.showAds(false);
 	    }
 
 	    @Override
 	    public void show() {
 	        // Tell the manager to load assets for the loading screen
-	    	manager = new AssetManager();
-	        manager.load("loading.pack", TextureAtlas.class);
+	    	loader_manager = new AssetManager();
+	        loader_manager.load("loading.pack", TextureAtlas.class);
 	        // Wait until they are finished loading
-	        manager.finishLoading();
+	        loader_manager.finishLoading();
 
 	        // Initialize the stage where we will place everything
 	        stage = new Stage();
 
 	        // Get our textureatlas from the manager
-	        TextureAtlas atlas = manager.get("loading.pack", TextureAtlas.class);
+	        TextureAtlas atlas = loader_manager.get("loading.pack", TextureAtlas.class);
 
 	        // Grab the regions from the atlas and create some images
 	        logo = new Image(atlas.findRegion("libgdx-logo"));
@@ -139,18 +137,13 @@ public class LoadingScreen implements Screen {
 	        // Clear the screen
 			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-			game.batch.begin();game.batch.end();
 
-	        if (game.manager.update() && percent >= 0.99f) { // Load some, will return true if done loading
-	        	game.bundle = game.manager.get("i18n/MyBundle", I18NBundle.class);
-	        	game.loadingScreen = new MainMenuScreen(game);
-	    		game.helpScreen = new HelpScreen(game);
-	    		game.endScreen = new EndScreen(game);
-	            game.setScreen(game.loadingScreen);
+	        if (RessourcesManager.getInstance().update() && percent >= 0.99f) { // Load some, will return true if done loading
+	        	ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 	        }
 	        
 	        // Interpolate the percentage to make it more smooth
-	        percent = Interpolation.linear.apply(percent, game.manager.getProgress(), 0.1f);
+	        percent = Interpolation.linear.apply(percent, RessourcesManager.getInstance().getProgress(), 0.1f);
 
 	        // Update positions (and size) to match the percentage
 	        loadingBarHidden.setX(startX + endX * percent);
@@ -161,13 +154,12 @@ public class LoadingScreen implements Screen {
 	        // Show the loading screen
 	        stage.act(Gdx.graphics.getDeltaTime());
 	        stage.draw();
-	        
 	    }
 
 	    @Override
 	    public void hide() {
 	        // Dispose the loading assets as we no longer need them
-	    	manager.unload("loading.pack");
+	    	loader_manager.unload("loading.pack");
 	    }
 
 		@Override
@@ -180,7 +172,7 @@ public class LoadingScreen implements Screen {
 
 		@Override
 		public void dispose() {
-			if(manager != null)
-				manager.dispose();
+			if(loader_manager != null)
+				loader_manager.dispose();
 		}
 	}

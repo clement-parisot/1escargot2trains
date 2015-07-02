@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,11 +19,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.escargot.game.EscargotGame;
+import com.escargot.game.RessourcesManager;
 import com.escargot.game.tuto.TrainActorTuto;
 
 public class ScoreScreen implements Screen {
 
-	final EscargotGame game;
 	private OrthographicCamera camera;
 	private Button retour, sign_in, sign_out, achiev, rank;
 	private Stage stage;
@@ -31,9 +32,12 @@ public class ScoreScreen implements Screen {
 	private boolean isSignedIn;
 	private Sprite spriteRails;
 	private TrainActorTuto train;
+	private SpriteBatch batch;
+	private Texture bgdTexture;
+	private BitmapFont fontVani;
 
-	public ScoreScreen(final EscargotGame game) {
-		this.game = game;
+	public ScoreScreen() {
+		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 960, 540);
 		stage = new Stage(new StretchViewport(960, 540));
@@ -44,7 +48,7 @@ public class ScoreScreen implements Screen {
 
 
 		skin = new Skin();
-		TextureAtlas atlas = game.manager.get("pack.atlas", TextureAtlas.class);
+		TextureAtlas atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
 		skin.addRegions(atlas);
 
 		// Button
@@ -55,8 +59,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				game.setScreen(game.loadingScreen);
-				dispose();
+				ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 			}
 		});
 		// Button
@@ -67,7 +70,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				game.myRequestHandler.beginUserSignIn();
+				EscargotGame.myRequestHandler.beginUserSignIn();
 			}
 		});
 		sign_out = new Button(skin.getDrawable("signOut"));
@@ -77,8 +80,8 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				if (game.myRequestHandler.isConnected()) {
-					game.myRequestHandler.signOutUser();
+				if (EscargotGame.myRequestHandler.isConnected()) {
+					EscargotGame.myRequestHandler.signOutUser();
 				}
 			}
 		});
@@ -90,7 +93,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				game.myRequestHandler.showAchievments();
+				EscargotGame.myRequestHandler.showAchievments();
 			}
 		});
 		// Button
@@ -101,7 +104,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				game.myRequestHandler.classement();
+				EscargotGame.myRequestHandler.classement();
 			}
 		});
 		
@@ -118,23 +121,24 @@ public class ScoreScreen implements Screen {
 		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
 		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteRails = new Sprite(railsTexture, 4096, 88);
+		bgdTexture = RessourcesManager.getInstance().getTexture("background_0.jpg");
+		fontVani = RessourcesManager.getInstance().getFont("vanilla.fnt");
 	}
 
 	@Override
 	public void render(float delta) {
-		isSignedIn = game.myRequestHandler.isSignedIn();
+		isSignedIn = EscargotGame.myRequestHandler.isSignedIn();
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		camera.update();
-		game.batch.setProjectionMatrix(camera.combined);
+		this.batch.setProjectionMatrix(camera.combined);
 
-		game.batch.begin();
-		game.batch.draw(game.manager.get("background_0.jpg", Texture.class), -512, 0, 1920, 1200);
+		this.batch.begin();
+		this.batch.draw(bgdTexture, -512, 0, 1920, 1200);
 		if (!isSignedIn) {
-			BitmapFont font = game.manager.get("vanilla.fnt", BitmapFont.class);
-			font.draw(game.batch,
-					"Please sign in to Google Play Game", 0, 500, 960,
+			fontVani.draw(this.batch,
+					"Please sign in to Google Play Game", 0, 480, 960,
 					Align.center, true);
 			sign_in.setVisible(true);
 			sign_out.setVisible(false);
@@ -142,7 +146,7 @@ public class ScoreScreen implements Screen {
 			sign_in.setVisible(false);
 			sign_out.setVisible(true);
 		}
-		if (!game.myRequestHandler.isConnected()) {
+		if (!EscargotGame.myRequestHandler.isConnected()) {
 			rank.setVisible(false);
 			achiev.setVisible(false);
 		} else {
@@ -150,12 +154,12 @@ public class ScoreScreen implements Screen {
 			achiev.setVisible(true);
 		}
 
-		game.batch.end();
+		this.batch.end();
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
-		game.batch.begin();
-		game.batch.draw(spriteRails, 0, 118, 1920, 32);
-		game.batch.end();
+		this.batch.begin();
+		this.batch.draw(spriteRails, 0, 118, 1920, 32);
+		this.batch.end();
 	}
 
 	@Override
@@ -165,9 +169,10 @@ public class ScoreScreen implements Screen {
 
 	@Override
 	public void show() {
-		game.myRequestHandler.showAds(true);
+		RessourcesManager.getInstance().finishLoad();
+		EscargotGame.myRequestHandler.showAds(true);
 		Gdx.input.setInputProcessor(stage);
-		if (!game.myRequestHandler.isConnected()) {
+		if (!EscargotGame.myRequestHandler.isConnected()) {
 			sign_in.setVisible(true);
 			sign_out.setVisible(false);
 			rank.setVisible(false);
@@ -182,7 +187,7 @@ public class ScoreScreen implements Screen {
 
 	@Override
 	public void hide() {
-		game.myRequestHandler.showAds(false);
+		EscargotGame.myRequestHandler.showAds(false);
 	}
 
 	@Override
@@ -191,12 +196,14 @@ public class ScoreScreen implements Screen {
 
 	@Override
 	public void resume() {
+		ScreenManager.getInstance().show(ScreenName.LOADING);
 	}
 
 	@Override
 	public void dispose() {
 		skin.dispose();
 		stage.dispose();
+		batch.dispose();
 	}
 
 }

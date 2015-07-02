@@ -61,3 +61,6 @@ build/
 
 ## OS Specific
 .DS_Store
+/google-play-services_lib
+/images
+/.gitignore
