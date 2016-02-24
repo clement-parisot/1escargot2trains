@@ -74,10 +74,10 @@ public class AndroidLauncher extends BaseGameActivity implements
 		RelativeLayout layout = new RelativeLayout(this);
 		View gameView = initializeForView(new EscargotGame(this), config);
 		adView = new AdView(this);
-		adView.setAdUnitId("***REMOVED***");
+		adView.setAdUnitId("");
 		adView.setAdSize(AdSize.SMART_BANNER);
 		mInterstitialAd = new InterstitialAd(this);
-		mInterstitialAd.setAdUnitId("***REMOVED***");
+		mInterstitialAd.setAdUnitId("");
 		// Initiez une demande generique.
 		requestNewAd();
 		layout.addView(gameView);
@@ -98,9 +98,9 @@ public class AndroidLauncher extends BaseGameActivity implements
 	
     private void requestNewAd() {
     	// Initiez une demande generique.
-		final String id1 = "***REMOVED***";
-		final String id2 = "***REMOVED***";
-		final String id3 = "***REMOVED***";
+		final String id1 = "";
+		final String id2 = "";
+		final String id3 = "";
 		AdRequest adRequest = new AdRequest.Builder()
 				.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
 				.addTestDevice(id1)
