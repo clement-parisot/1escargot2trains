@@ -1,0 +1,6 @@
+{
+  "name": "1escargot2trains",
+  "tagline": "Jeu Androïd, Java et html",
+  "body": "### 1 Escargot 2 Trains\r\nAidez 1 escargot alors que 2 trains arrivent ! Saurez-vous rester en vie ?\r\n\r\n***\r\n\r\n\r\n### Le jeu\r\nVous êtes un escargot ! Restez le plus longtemps en vie avant que les 2 trains ne vous écrasent. Plus vous êtes proche du train plus vous gagnez des points. Un jeu drôle et facile !\r\n\r\nCommandes:\r\nToucher l’écran pour changer de direction.\r\nPlus vous êtes proche du train, plus vous gagnez des points.\r\nAccélérez en touchant longtemps l'écran\r\nBon jeu !\r\n\r\n### Commandes\r\nTouchez l'écran à gauche ou à droite pour changer la direction de l'escargot.\r\n\r\nAppuyez plus longtemps pour accélérer.\r\n\r\n### Auteur\r\nCréé par Clément Parisot (@clement-parisot) avec LibGDX.\r\n\r\n### Aide / Contact\r\nUn problème avec l'application ? Envoyez un mail à contact[at]clement-parisot.ovh\r\n\r\n### Liens\r\n* [GitHub](https://github.com/clement-parisot/1escargot2trains/)\r\n* [Télécharger sur Google Play] (https://play.google.com/store/apps/details?id=com.escargot.game.android)\r\n* [Facebook] (https://www.facebook.com/1escargot2trains/)",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
