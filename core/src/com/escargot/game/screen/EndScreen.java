@@ -92,7 +92,6 @@ public class EndScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				EscargotGame.myRequestHandler.rateApp();
 			}
 		});
 		table.addActor(retour);
@@ -100,7 +99,6 @@ public class EndScreen implements Screen {
 
 		table.bottom();
 		bgd_tex = RessourcesManager.getInstance().getTexture("background_0.jpg");
-		EscargotGame.myRequestHandler.showAds(true);
 	}
 
 	@Override
@@ -136,36 +134,35 @@ public class EndScreen implements Screen {
 	@Override
 	public void show() {
 		RessourcesManager.getInstance().finishLoad();
-		EscargotGame.myRequestHandler.showAds(true);
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		prefs.putBoolean("son_on", EscargotGame.son_on);
 		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
 		prefs.putFloat("max_score", EscargotGame.score_player.getMaxScoreValue());
 		prefs.flush();
 		int scoreNb = EscargotGame.score_player.getScore();
-		EscargotGame.myRequestHandler.envoyerScore(scoreNb);
+		//EscargotGame.myRequestHandler.envoyerScore(scoreNb);
 		if (scoreNb >= 500 && !EscargotGame.achievementList[0]) {
-			EscargotGame.myRequestHandler.unlock(0);
+			//EscargotGame.myRequestHandler.unlock(0);
 			EscargotGame.achievementList[0] = true;
 			prefs.putBoolean("a0", true);
 		}
 		if (scoreNb >= 1000 && !EscargotGame.achievementList[1]) {
-			EscargotGame.myRequestHandler.unlock(1);
+			//EscargotGame.myRequestHandler.unlock(1);
 			EscargotGame.achievementList[1] = true;
 			prefs.putBoolean("a1", true);
 		}
 		if (scoreNb >= 2000 && !EscargotGame.achievementList[2]) {
-			EscargotGame.myRequestHandler.unlock(2);
+			//EscargotGame.myRequestHandler.unlock(2);
 			EscargotGame.achievementList[2] = true;
 			prefs.putBoolean("a2", true);
 		}
 		if (scoreNb >= 3000 && !EscargotGame.achievementList[3]) {
-			EscargotGame.myRequestHandler.unlock(3);
+			//EscargotGame.myRequestHandler.unlock(3);
 			EscargotGame.achievementList[3] = true;
 			prefs.putBoolean("a3", true);
 		}
 		if (scoreNb >= 4000 && !EscargotGame.achievementList[4]) {
-			EscargotGame.myRequestHandler.unlock(4);
+			//EscargotGame.myRequestHandler.unlock(4);
 			EscargotGame.achievementList[4] = true;
 			prefs.putBoolean("a4", true);
 		}
@@ -174,7 +171,7 @@ public class EndScreen implements Screen {
 		score_player.getActor().setText(""+EscargotGame.score_player);
 		bestscore_player.getActor().setText(""+EscargotGame.score_player.getMaxScore());
 		if(EscargotGame.playTime > 3){
-			EscargotGame.myRequestHandler.show_inter_ads();
+			//EscargotGame.myRequestHandler.show_inter_ads();
 			EscargotGame.playTime = 0;
 			System.out.println("show");
 		}
@@ -184,7 +181,6 @@ public class EndScreen implements Screen {
 
 	@Override
 	public void hide() {
-		EscargotGame.myRequestHandler.showAds(false);
 	}
 
 	@Override

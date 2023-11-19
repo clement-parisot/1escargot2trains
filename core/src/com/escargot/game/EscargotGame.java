@@ -1,5 +1,6 @@
 package com.escargot.game;
 
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -14,16 +15,11 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public static boolean son_on = true;
 	public static boolean vibre_on = true;
 	public Screen mainScreen, tutoScreen, gameScreen, endScreen, scoreScreen;
-	public static IActivityRequestHandler myRequestHandler;
 	public static boolean achievementList[] = { false, false, false, false, false };
 	public static int playTime = 3;
 	private Preferences prefs;
 	public I18NBundle bundle;
 	public boolean pause = false;
-
-	public EscargotGame(IActivityRequestHandler handler) {
-		myRequestHandler = handler;
-	}
 
 	@Override
 	public void create() {

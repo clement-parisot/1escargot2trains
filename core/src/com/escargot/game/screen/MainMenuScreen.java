@@ -106,10 +106,8 @@ public class MainMenuScreen implements Screen {
 				if (prefs.getBoolean("firstGame", true)) {
 					prefs.putBoolean("firstGame", false);
 					prefs.flush();
-					ScreenManager.getInstance().show(ScreenName.TUTO);
-				} else {
-					ScreenManager.getInstance().show(ScreenName.GAME);
 				}
+				ScreenManager.getInstance().show(ScreenName.GAME);
 			}
 		});
 		but_score = new Button(skin.getDrawable("score"));
@@ -177,10 +175,10 @@ public class MainMenuScreen implements Screen {
 				Actions.scaleTo(1f, 1f))));
 		stage.addActor(escargot);
 		trainG = new TrainActor(280,145,0.5f,-1,0);
-		trainG.setTexture(skin.getSprite("train"));
+		trainG.setTexture(atlas.findRegion("train"));
 		stage.addActor(trainG);
 		trainD = new TrainActor(680,145,0.5f,1,0);
-		trainD.setTexture(skin.getSprite("train"));
+		trainD.setTexture(atlas.findRegion("train"));
 		stage.addActor(trainD);
 		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
 		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
@@ -199,8 +197,6 @@ public class MainMenuScreen implements Screen {
 
 		main_buttons.pack();
 		main_buttons.setPosition(480, 0, Align.bottom+Align.center);
-		// Pub
-		EscargotGame.myRequestHandler.showAds(true);
 		Table t = new Table();
 		
 		t.defaults().pad(10);
@@ -266,7 +262,6 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
-		EscargotGame.myRequestHandler.showAds(true);
 		Gdx.input.setInputProcessor(stage);
 		but_son.setVisible(false);
 		but_vibre.setVisible(false);
@@ -274,7 +269,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void hide() {
-		EscargotGame.myRequestHandler.showAds(false);
+
 	}
 
 	@Override

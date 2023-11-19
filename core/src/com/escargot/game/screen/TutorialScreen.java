@@ -181,10 +181,10 @@ public class TutorialScreen implements Screen {
 		escargot.setTexture(animation);
 		stage.addActor(escargot);
 		trainG = new TrainActorTuto(0, 150, 0.5f,-1,0.4);
-		trainG.setTexture(skin.getSprite("train"));
+		trainG.setTexture(atlas.findRegion("train"));
 		stage.addActor(trainG);
 		trainD = new TrainActorTuto(1920, 150,0.5f,1,0.4);
-		trainD.setTexture(skin.getSprite("train"));
+		trainD.setTexture(atlas.findRegion("train"));
 		listeTrain = new ArrayList<TrainActorTuto>();
 		listeTrain.add(trainD);
 		listeTrain.add(trainG);
@@ -251,9 +251,7 @@ public class TutorialScreen implements Screen {
 				escargot.setVitesse(0.6);
 			}
 		});
-		
-		// Pub
-		EscargotGame.myRequestHandler.showAds(false);
+
 		Texture bgdTexture = RessourcesManager.getInstance().getTexture("background_0.jpg");
 		bgdTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteBgd = new Sprite(bgdTexture, 0, 0, 1920, 1080);
@@ -446,13 +444,11 @@ public class TutorialScreen implements Screen {
 			sound_train.play();
 			music_bg.play();
 		}
-		EscargotGame.myRequestHandler.showAds(false);
 		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void hide() {
-		EscargotGame.myRequestHandler.showAds(false);
 		sound_train.stop();
 		music_bg.stop();
 	}

@@ -3,6 +3,7 @@ package com.escargot.game.tuto;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Align;
 
@@ -61,7 +62,7 @@ public class EscargotActorMenu extends Actor {
 	public void draw(Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 		this.texture.setFrameDuration((float) (1/(getVitesse()*30f)));
-		batch.draw(this.texture.getKeyFrame(this.stateTime, true), getX(), getY(), getOriginX(), getOriginY(),
+		batch.draw((TextureRegion) this.texture.getKeyFrame(this.stateTime, true), getX(), getY(), getOriginX(), getOriginY(),
 				getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
 	}
 }

@@ -70,7 +70,6 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				EscargotGame.myRequestHandler.beginUserSignIn();
 			}
 		});
 		sign_out = new Button(skin.getDrawable("signOut"));
@@ -80,9 +79,6 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				if (EscargotGame.myRequestHandler.isConnected()) {
-					EscargotGame.myRequestHandler.signOutUser();
-				}
 			}
 		});
 		// Button
@@ -93,7 +89,6 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				EscargotGame.myRequestHandler.showAchievments();
 			}
 		});
 		// Button
@@ -104,7 +99,6 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				EscargotGame.myRequestHandler.classement();
 			}
 		});
 		
@@ -116,7 +110,7 @@ public class ScoreScreen implements Screen {
 		
 		table.bottom();
 		train = new TrainActorTuto(600, 150, 1f,-1,0);
-		train.setTexture(skin.getSprite("train"));
+		train.setTexture(atlas.findRegion("train"));
 		stage.addActor(train);
 		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
 		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
@@ -127,7 +121,6 @@ public class ScoreScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		isSignedIn = EscargotGame.myRequestHandler.isSignedIn();
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -146,7 +139,7 @@ public class ScoreScreen implements Screen {
 			sign_in.setVisible(false);
 			sign_out.setVisible(true);
 		}
-		if (!EscargotGame.myRequestHandler.isConnected()) {
+		if (!false) {
 			rank.setVisible(false);
 			achiev.setVisible(false);
 		} else {
@@ -170,9 +163,8 @@ public class ScoreScreen implements Screen {
 	@Override
 	public void show() {
 		RessourcesManager.getInstance().finishLoad();
-		EscargotGame.myRequestHandler.showAds(true);
 		Gdx.input.setInputProcessor(stage);
-		if (!EscargotGame.myRequestHandler.isConnected()) {
+		if (!false) {
 			sign_in.setVisible(true);
 			sign_out.setVisible(false);
 			rank.setVisible(false);
@@ -187,7 +179,6 @@ public class ScoreScreen implements Screen {
 
 	@Override
 	public void hide() {
-		EscargotGame.myRequestHandler.showAds(false);
 	}
 
 	@Override

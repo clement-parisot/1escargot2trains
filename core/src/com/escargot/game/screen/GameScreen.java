@@ -85,7 +85,6 @@ public class GameScreen implements Screen {
 	private BitmapFont fontVani;
 
 	public GameScreen() {
-		EscargotGame.myRequestHandler.showAds(false);
 		EscargotGame.score_player.resetScore();
 		end = false;
 		batch = new SpriteBatch();
@@ -141,10 +140,10 @@ public class GameScreen implements Screen {
 		escargot.setTexture(animation);
 		stage.addActor(escargot);
 		trainG = new TrainActorTuto(0, 150, 0.5f,-1,0.4);
-		trainG.setTexture(skin.getSprite("train"));
+		trainG.setTexture(atlas.findRegion("train"));
 		stage.addActor(trainG);
 		trainD = new TrainActorTuto(1920, 150,0.5f,1,0.4);
-		trainD.setTexture(skin.getSprite("train"));
+		trainD.setTexture(atlas.findRegion("train"));
 		listeTrain = new ArrayList<TrainActorTuto>();
 		listeTrain.add(trainD);
 		listeTrain.add(trainG);
@@ -347,7 +346,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void hide() {
-		EscargotGame.myRequestHandler.showAds(false);
 		sound_train.stop();
 		music_bg.stop();
 	}
