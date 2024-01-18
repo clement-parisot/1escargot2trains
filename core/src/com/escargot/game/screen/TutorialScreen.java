@@ -106,13 +106,6 @@ public class TutorialScreen implements Screen {
 		stage = new Stage(new StretchViewport(1920, 1080)){
 			@Override
 			public boolean keyDown(int keycode) {
-				if(keycode == Keys.BACK || keycode == Keys.ESCAPE){
-					Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
-					if (!prefs.getBoolean("firstGame", true)) {
-						ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
-					}
-					return false;
-				}
 				if(step0_displayText){
 					resume();
 					step0_displayText = false;
@@ -136,7 +129,7 @@ public class TutorialScreen implements Screen {
 				if (keycode == Keys.RIGHT) {
 					faster = true;
 					escargot.setVitesse(1.2);
-					escargot.flip(640);
+					escargot.flip(1920);
 					if(step1_displayRight){
 						resume();
 						step1_5_wait = true;
@@ -144,14 +137,21 @@ public class TutorialScreen implements Screen {
 					}
 					return true;
 				}
-				return true;
+				return false;
 			}
 
 			@Override
 			public boolean keyUp(int keycode) {
-				faster = false;
-				escargot.setVitesse(0.6);
-				return true;
+				if(keycode == Keys.BACK || keycode == Keys.ESCAPE){
+					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
+					return true;
+				}
+				if (keycode == Keys.RIGHT || keycode == Keys.LEFT) {
+					faster = false;
+					escargot.setVitesse(0.6);
+					return true;
+				}
+				return false;
 			}
 		};
 		score_game = new Score();

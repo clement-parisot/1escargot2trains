@@ -17,16 +17,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.RessourcesManager;
 
-public class EndScreen implements Screen {
+public class SimpleScoreScreen implements Screen {
 
 	private OrthographicCamera camera;
 	private Button retour;
@@ -34,21 +34,16 @@ public class EndScreen implements Screen {
 	private Skin skin;
 	private HorizontalGroup table;
 	private SpriteBatch batch;
-	private Container<Label> score_player;
 	private Container<Label> bestscore_player;
 	private Texture bgd_tex;
 
-	public EndScreen() {
+	public SimpleScoreScreen() {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 960, 540);
 		stage = new Stage(new StretchViewport(960, 540)){
 			@Override
 			public boolean keyUp(int keycode) {
-				if (keycode == Input.Keys.ENTER || keycode == Input.Keys.CENTER) {
-					ScreenManager.getInstance().show(ScreenName.GAME);
-					return true;
-				}
 				if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK || keycode == Input.Keys.LEFT) {
 					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 					return true;
@@ -58,6 +53,7 @@ public class EndScreen implements Screen {
 		};
 		Gdx.input.setInputProcessor(stage);
 		table = new HorizontalGroup();
+		table.pad(30);
 		table.setFillParent(true);
 		stage.addActor(table);
 		Table t = new Table();
@@ -66,19 +62,13 @@ public class EndScreen implements Screen {
 		stage.addActor(t);
 		LabelStyle vanillaStyle = new LabelStyle(RessourcesManager.getInstance().getFont("vanilla.fnt"), Color.WHITE);
 		LabelStyle nashStyle = new LabelStyle(RessourcesManager.getInstance().getFont("nashville.fnt"), Color.WHITE);
-		Container<Label> gameover = new Container<Label>(new Label(RessourcesManager.getInstance().getBundle().get("gameover"), nashStyle));
-		Container<Label> score_label = new Container<Label>(new Label(RessourcesManager.getInstance().getBundle().get("score"), nashStyle));
-		vanillaStyle.font.setFixedWidthGlyphs(""+EscargotGame.score_player.toString());
-		score_player = new Container<Label>(new Label(""+EscargotGame.score_player, vanillaStyle));
+		Container<Label> gameover = new Container<Label>(new Label(RessourcesManager.getInstance().getBundle().get("simple_score"), nashStyle));
 		Container<Label> bestscore = new Container<Label>(new Label(RessourcesManager.getInstance().getBundle().get("bestscore"), nashStyle));
 		vanillaStyle.font.setFixedWidthGlyphs(""+EscargotGame.score_player.getMaxScore());
 		bestscore_player = new Container<Label>(new Label(""+ EscargotGame.score_player.getMaxScore(), vanillaStyle));
 		gameover.fillX();
 		Cell<Container<Label>> c = t.add(gameover);
 		c.colspan(2);
-		t.row();
-		t.add(score_label);
-		t.add(score_player);
 		t.row();
 		t.add(bestscore);
 		t.add(bestscore_player);
@@ -98,8 +88,8 @@ public class EndScreen implements Screen {
 				ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 			}
 		});
+
 		table.addActor(retour);
-		table.pad(30);
 
 		table.bottom();
 		bgd_tex = RessourcesManager.getInstance().getTexture("background_0.jpg");
@@ -126,7 +116,7 @@ public class EndScreen implements Screen {
 					0);
 			camera.unproject(touchPos);
 			if (touchPos.y > 70)
-				ScreenManager.getInstance().show(ScreenName.GAME);
+				ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 		}
 	}
 
@@ -143,44 +133,8 @@ public class EndScreen implements Screen {
 		prefs.putBoolean("vibre_on", EscargotGame.vibre_on);
 		prefs.putFloat("max_score", EscargotGame.score_player.getMaxScoreValue());
 		prefs.flush();
-		int scoreNb = EscargotGame.score_player.getScore();
-		//EscargotGame.myRequestHandler.envoyerScore(scoreNb);
-		if (scoreNb >= 500 && !EscargotGame.achievementList[0]) {
-			//EscargotGame.myRequestHandler.unlock(0);
-			EscargotGame.achievementList[0] = true;
-			prefs.putBoolean("a0", true);
-		}
-		if (scoreNb >= 1000 && !EscargotGame.achievementList[1]) {
-			//EscargotGame.myRequestHandler.unlock(1);
-			EscargotGame.achievementList[1] = true;
-			prefs.putBoolean("a1", true);
-		}
-		if (scoreNb >= 2000 && !EscargotGame.achievementList[2]) {
-			//EscargotGame.myRequestHandler.unlock(2);
-			EscargotGame.achievementList[2] = true;
-			prefs.putBoolean("a2", true);
-		}
-		if (scoreNb >= 3000 && !EscargotGame.achievementList[3]) {
-			//EscargotGame.myRequestHandler.unlock(3);
-			EscargotGame.achievementList[3] = true;
-			prefs.putBoolean("a3", true);
-		}
-		if (scoreNb >= 4000 && !EscargotGame.achievementList[4]) {
-			//EscargotGame.myRequestHandler.unlock(4);
-			EscargotGame.achievementList[4] = true;
-			prefs.putBoolean("a4", true);
-		}
-		prefs.flush();
 		Gdx.input.setInputProcessor(stage);
-		score_player.getActor().setText(""+EscargotGame.score_player);
 		bestscore_player.getActor().setText(""+EscargotGame.score_player.getMaxScore());
-		if(EscargotGame.playTime > 3){
-			//EscargotGame.myRequestHandler.show_inter_ads();
-			EscargotGame.playTime = 0;
-			System.out.println("show");
-		}
-		System.out.println(EscargotGame.playTime);
-		EscargotGame.playTime +=1;
 	}
 
 	@Override

@@ -42,8 +42,13 @@ public enum ScreenName {
         protected com.badlogic.gdx.Screen getScreenInstance() {
              return new ScoreScreen();
         }
+    },
+
+    SIMPLESCORE{
+        @Override
+        protected com.badlogic.gdx.Screen getScreenInstance() { return new SimpleScoreScreen(); }
     };
- 
+
     protected abstract com.badlogic.gdx.Screen getScreenInstance();
  
 }
