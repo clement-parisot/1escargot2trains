@@ -1,8 +1,12 @@
  package com.escargot.game.screen;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +21,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -50,6 +56,8 @@ public class MainMenuScreen implements Screen {
 	private ParticleEffectPool fumeePool;
 	private TrainActor trainG;
 	private TrainActor trainD;
+	private Music music_bg;
+	private Sound sound_train;
 	private Sprite spriteRails;
 	private Animation animation;
 	private HorizontalGroup menuBar;
@@ -61,10 +69,33 @@ public class MainMenuScreen implements Screen {
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 960, 540);
-		stage = new Stage(new StretchViewport(960, 540));
+		stage = new Stage(new StretchViewport(960, 540)){
+			@Override
+			public boolean keyUp(int keycode) {
+				if (keycode == Input.Keys.ENTER || keycode == Input.Keys.CENTER) {
+					ScreenManager.getInstance().show(ScreenName.GAME);
+					return true;
+				}
+				else if(keycode == Input.Keys.RIGHT) {
+					ScreenManager.getInstance().show(ScreenName.TUTO);
+					return true;
+				}
+				else if(keycode == Input.Keys.LEFT) {
+					ScreenManager.getInstance().show(ScreenName.SIMPLESCORE);
+					return true;
+				}
+				else if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK) {
+					Gdx.app.exit();
+					return true;
+				}
+				return false;
+			}
+		};
 		main_buttons = new HorizontalGroup();
 		main_buttons.align(Align.center);
+		main_buttons.pad(30);
 		menuBar = new HorizontalGroup();
+		menuBar.pad(30);
 		menuBar.align(Align.bottomRight);
 		stage.addActor(menuBar);
 		stage.addActor(main_buttons);
@@ -73,7 +104,10 @@ public class MainMenuScreen implements Screen {
 		// Main buttons
 		TextureAtlas atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
 		skin.addRegions(atlas);
-		
+
+		// On TV ?
+		boolean isTelevision = Gdx.app.getType().equals(Application.ApplicationType.Android) &&	!Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
+
 		// Button
 		but_son = new Button(skin.getDrawable("son_on"),skin.getDrawable("son_off"),skin.getDrawable("son_off"));
 		but_son.addListener(new ChangeListener() {
@@ -117,7 +151,7 @@ public class MainMenuScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				ScreenManager.getInstance().show(ScreenName.SCORE);
+				ScreenManager.getInstance().show(ScreenName.SIMPLESCORE);
 			}
 		});
 		but_quit = new Button(skin.getDrawable("signOut"));
@@ -154,15 +188,17 @@ public class MainMenuScreen implements Screen {
 					ScreenManager.getInstance().show(ScreenName.TUTO);
 			}
 		});
-		but_aide.setPosition(960, 0, Align.bottomRight);
+		but_aide.setPosition(930, 30, Align.bottomRight);
 		stage.addActor(but_aide);
 		// Add to stage
 		main_buttons.addActor(but_score);
 		main_buttons.addActor(but_play);
-		main_buttons.addActor(but_quit);
-		menuBar.addActor(but_param);
-		menuBar.addActor(but_son);
-		menuBar.addActor(but_vibre);
+		if(!isTelevision) {
+			main_buttons.addActor(but_quit);
+			menuBar.addActor(but_param);
+			menuBar.addActor(but_son);
+			menuBar.addActor(but_vibre);
+		}
 		menuBar.pack();
 		
 		escargot = new EscargotActorMenu(480, 145, 0.16f, 1);
@@ -227,6 +263,9 @@ public class MainMenuScreen implements Screen {
 		menuBar.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
 		but_aide.addAction(Actions.sequence(Actions.alpha(0),Actions.delay(2f),Actions.alpha(1.00f,0.5f)));
 		bgd_tex = RessourcesManager.getInstance().getTexture("background_0.jpg");
+		music_bg = RessourcesManager.getInstance().getMusic("sound0.mp3");
+		music_bg.setLooping(true);
+		sound_train = RessourcesManager.getInstance().getSound("sound2.wav");
 	}
 
 	@Override
@@ -242,8 +281,6 @@ public class MainMenuScreen implements Screen {
 
 
 		this.batch.end();
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
 		this.batch.begin();
 		this.batch.enableBlending();
 		this.batch.draw(spriteRails, 0, 115, 960, 32);
@@ -253,6 +290,8 @@ public class MainMenuScreen implements Screen {
 			effect.draw(this.batch, delta);
 		}
 		this.batch.end();
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
 	}
 
 	@Override
@@ -265,15 +304,20 @@ public class MainMenuScreen implements Screen {
 		Gdx.input.setInputProcessor(stage);
 		but_son.setVisible(false);
 		but_vibre.setVisible(false);
+		if (EscargotGame.son_on) {
+			sound_train.play();
+			music_bg.play();
+		}
 	}
 
 	@Override
 	public void hide() {
-
+		music_bg.stop();
 	}
 
 	@Override
 	public void pause() {
+		music_bg.stop();
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.escargot.game.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -28,7 +29,7 @@ import com.escargot.game.RessourcesManager;
 public class EndScreen implements Screen {
 
 	private OrthographicCamera camera;
-	private Button retour, noter;
+	private Button retour;
 	private Stage stage;
 	private Skin skin;
 	private HorizontalGroup table;
@@ -41,7 +42,20 @@ public class EndScreen implements Screen {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 960, 540);
-		stage = new Stage(new StretchViewport(960, 540));
+		stage = new Stage(new StretchViewport(960, 540)){
+			@Override
+			public boolean keyUp(int keycode) {
+				if (keycode == Input.Keys.ENTER || keycode == Input.Keys.CENTER) {
+					ScreenManager.getInstance().show(ScreenName.GAME);
+					return true;
+				}
+				if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK || keycode == Input.Keys.LEFT) {
+					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
+					return true;
+				}
+				return false;
+			}
+		};
 		Gdx.input.setInputProcessor(stage);
 		table = new HorizontalGroup();
 		table.setFillParent(true);
@@ -84,18 +98,8 @@ public class EndScreen implements Screen {
 				ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 			}
 		});
-
-		noter = new Button(skin.getDrawable("star"));
-		noter.addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if(EscargotGame.vibre_on)
-					Gdx.input.vibrate(50);
-			}
-		});
 		table.addActor(retour);
-		table.addActor(noter);
+		table.pad(30);
 
 		table.bottom();
 		bgd_tex = RessourcesManager.getInstance().getTexture("background_0.jpg");

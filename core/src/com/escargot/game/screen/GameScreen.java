@@ -93,25 +93,32 @@ public class GameScreen implements Screen {
 			@Override
 			public boolean keyDown(int keycode) {
 				if (keycode == Keys.LEFT) {
-					faster = true;
-					escargot.setVitesse(1.2);
 					escargot.flip(0);
+					escargot.setVitesse(1.2);
+					faster = true;
 					return true;
 				}
 				if (keycode == Keys.RIGHT) {
-					faster = true;
+					escargot.flip(1920);
 					escargot.setVitesse(1.2);
-					escargot.flip(640);
+					faster = true;
 					return true;
 				}
-				return true;
+				return false;
 			}
 
 			@Override
 			public boolean keyUp(int keycode) {
-				faster = false;
-				escargot.setVitesse(0.6);
-				return true;
+				if (keycode == Keys.LEFT || keycode == Keys.RIGHT ) {
+					faster = false;
+					escargot.setVitesse(0.6);
+					return true;
+				}
+				if(keycode == Keys.BACK || keycode == Keys.ESCAPE){
+					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
+					return true;
+				}
+				return false;
 			}
 		};
 		
