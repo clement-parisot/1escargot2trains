@@ -144,29 +144,29 @@ public class EndScreen implements Screen {
 		prefs.putFloat("max_score", EscargotGame.score_player.getMaxScoreValue());
 		prefs.flush();
 		int scoreNb = EscargotGame.score_player.getScore();
-		//EscargotGame.myRequestHandler.envoyerScore(scoreNb);
+		EscargotGame.myRequestHandler.envoyerScore(scoreNb);
 		if (scoreNb >= 500 && !EscargotGame.achievementList[0]) {
-			//EscargotGame.myRequestHandler.unlock(0);
+			EscargotGame.myRequestHandler.unlock(0);
 			EscargotGame.achievementList[0] = true;
 			prefs.putBoolean("a0", true);
 		}
 		if (scoreNb >= 1000 && !EscargotGame.achievementList[1]) {
-			//EscargotGame.myRequestHandler.unlock(1);
+			EscargotGame.myRequestHandler.unlock(1);
 			EscargotGame.achievementList[1] = true;
 			prefs.putBoolean("a1", true);
 		}
 		if (scoreNb >= 2000 && !EscargotGame.achievementList[2]) {
-			//EscargotGame.myRequestHandler.unlock(2);
+			EscargotGame.myRequestHandler.unlock(2);
 			EscargotGame.achievementList[2] = true;
 			prefs.putBoolean("a2", true);
 		}
 		if (scoreNb >= 3000 && !EscargotGame.achievementList[3]) {
-			//EscargotGame.myRequestHandler.unlock(3);
+			EscargotGame.myRequestHandler.unlock(3);
 			EscargotGame.achievementList[3] = true;
 			prefs.putBoolean("a3", true);
 		}
 		if (scoreNb >= 4000 && !EscargotGame.achievementList[4]) {
-			//EscargotGame.myRequestHandler.unlock(4);
+			EscargotGame.myRequestHandler.unlock(4);
 			EscargotGame.achievementList[4] = true;
 			prefs.putBoolean("a4", true);
 		}
@@ -181,6 +181,7 @@ public class EndScreen implements Screen {
 		}
 		System.out.println(EscargotGame.playTime);
 		EscargotGame.playTime +=1;
+		EscargotGame.myRequestHandler.isSignedIn();
 	}
 
 	@Override

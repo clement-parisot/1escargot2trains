@@ -2,12 +2,13 @@ package com.escargot.game.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.IntMap;
+import com.escargot.game.EscargotGame;
 
 public final class ScreenManager {
 	 
     private static ScreenManager instance;
  
-    private Game game;
+    private EscargotGame game;
     private IntMap<com.badlogic.gdx.Screen> screens;
     
     private ScreenManager() {
@@ -21,7 +22,7 @@ public final class ScreenManager {
         return instance;
     }
     
-    public void initialize(Game game) {
+    public void initialize(EscargotGame game) {
         this.game = game;
     }
     

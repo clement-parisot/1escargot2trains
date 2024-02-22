@@ -38,6 +38,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.escargot.game.EscargotGame;
 import com.escargot.game.Fumee;
+import com.escargot.game.IActivityRequestHandler;
 import com.escargot.game.RessourcesManager;
 import com.escargot.game.TrainActor;
 import com.escargot.game.tuto.EscargotActorMenu;
@@ -81,10 +82,14 @@ public class MainMenuScreen implements Screen {
 					return true;
 				}
 				else if(keycode == Input.Keys.LEFT) {
-					ScreenManager.getInstance().show(ScreenName.SIMPLESCORE);
+					ScreenManager.getInstance().show(ScreenName.SCORE);
 					return true;
 				}
-				else if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK) {
+				return false;
+			}
+			@Override
+			public boolean keyDown(int keycode) {
+				if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK) {
 					Gdx.app.exit();
 					return true;
 				}
@@ -151,7 +156,7 @@ public class MainMenuScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
-				ScreenManager.getInstance().show(ScreenName.SIMPLESCORE);
+				ScreenManager.getInstance().show(ScreenName.SCORE);
 			}
 		});
 		but_quit = new Button(skin.getDrawable("signOut"));
@@ -190,6 +195,13 @@ public class MainMenuScreen implements Screen {
 		});
 		but_aide.setPosition(930, 30, Align.bottomRight);
 		stage.addActor(but_aide);
+
+		// AndroidTV hide buttons
+		if(EscargotGame.isOnAndroidTV()){
+			but_param.setVisible(false);
+			but_quit.setVisible(false);
+		}
+
 		// Add to stage
 		main_buttons.addActor(but_score);
 		main_buttons.addActor(but_play);

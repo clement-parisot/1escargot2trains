@@ -1,5 +1,7 @@
 package com.escargot.game.screen;
 
+import com.escargot.game.IActivityRequestHandler;
+
 public enum ScreenName {
 	 
     LOADING {

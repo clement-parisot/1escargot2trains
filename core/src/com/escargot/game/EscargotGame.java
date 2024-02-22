@@ -1,9 +1,11 @@
 package com.escargot.game;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -20,6 +22,10 @@ public class EscargotGame extends Game implements ApplicationListener {
 	private Preferences prefs;
 	public I18NBundle bundle;
 	public boolean pause = false;
+	public static IActivityRequestHandler myRequestHandler;
+	public EscargotGame(IActivityRequestHandler handler) {
+		myRequestHandler = handler;
+	}
 
 	@Override
 	public void create() {
@@ -55,5 +61,10 @@ public class EscargotGame extends Game implements ApplicationListener {
 		score_player.updateBestScore();
 		prefs.putFloat("max_score", score_player.getMaxScoreValue());
 		prefs.flush();
+	}
+
+	public static boolean isOnAndroidTV() {
+		return Gdx.app.getType().equals(Application.ApplicationType.Android) &&
+				!Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
 	}
 }

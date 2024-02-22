@@ -1,6 +1,7 @@
 package com.escargot.game.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -40,7 +41,40 @@ public class ScoreScreen implements Screen {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 960, 540);
-		stage = new Stage(new StretchViewport(960, 540));
+		stage = new Stage(new StretchViewport(960, 540)){
+			@Override
+			public boolean keyUp(int keycode) {
+				if (keycode == Input.Keys.ENTER || keycode == Input.Keys.CENTER) {
+					if(EscargotGame.myRequestHandler.isSignedIn()){
+						EscargotGame.myRequestHandler.classement();
+					} else {
+						EscargotGame.myRequestHandler.beginUserSignIn();
+					}
+					return true;
+				}
+				else if(keycode == Input.Keys.RIGHT) {
+					if(EscargotGame.myRequestHandler.isSignedIn()){
+						EscargotGame.myRequestHandler.classement();
+					} else {
+						EscargotGame.myRequestHandler.beginUserSignIn();
+					}
+					return true;
+				}
+				else if(keycode == Input.Keys.LEFT) {
+					if(EscargotGame.myRequestHandler.isSignedIn()){
+						EscargotGame.myRequestHandler.showAchievments();
+					} else {
+						ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
+					}
+					return true;
+				}
+				else if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK) {
+					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
+					return true;
+				}
+				return false;
+			}
+		};
 		Gdx.input.setInputProcessor(stage);
 		table = new HorizontalGroup();
 		table.setFillParent(true);
@@ -70,6 +104,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
+				EscargotGame.myRequestHandler.beginUserSignIn();
 			}
 		});
 		sign_out = new Button(skin.getDrawable("signOut"));
@@ -79,6 +114,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
+				EscargotGame.myRequestHandler.signOutUser();
 			}
 		});
 		// Button
@@ -89,6 +125,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
+				EscargotGame.myRequestHandler.showAchievments();
 			}
 		});
 		// Button
@@ -99,6 +136,7 @@ public class ScoreScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if(EscargotGame.vibre_on)
 					Gdx.input.vibrate(50);
+				EscargotGame.myRequestHandler.classement();
 			}
 		});
 		
@@ -129,7 +167,7 @@ public class ScoreScreen implements Screen {
 
 		this.batch.begin();
 		this.batch.draw(bgdTexture, -512, 0, 1920, 1200);
-		if (!isSignedIn) {
+		if (!EscargotGame.myRequestHandler.isSignedIn()) {
 			fontVani.draw(this.batch,
 					"Please sign in to Google Play Game", 0, 480, 960,
 					Align.center, true);
@@ -139,7 +177,7 @@ public class ScoreScreen implements Screen {
 			sign_in.setVisible(false);
 			sign_out.setVisible(true);
 		}
-		if (!false) {
+		if (!EscargotGame.myRequestHandler.isSignedIn()) {
 			rank.setVisible(false);
 			achiev.setVisible(false);
 		} else {
@@ -164,7 +202,7 @@ public class ScoreScreen implements Screen {
 	public void show() {
 		RessourcesManager.getInstance().finishLoad();
 		Gdx.input.setInputProcessor(stage);
-		if (!false) {
+		if (!EscargotGame.myRequestHandler.isSignedIn()) {
 			sign_in.setVisible(true);
 			sign_out.setVisible(false);
 			rank.setVisible(false);
