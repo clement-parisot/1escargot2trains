@@ -29,7 +29,7 @@ public class ScoreScreen implements Screen {
 	private Button retour, sign_in, sign_out, achiev, rank;
 	private Stage stage;
 	private Skin skin;
-	private HorizontalGroup table;
+	private HorizontalGroup table, table2;
 	private boolean isSignedIn;
 	private Sprite spriteRails;
 	private TrainActorTuto train;
@@ -72,13 +72,15 @@ public class ScoreScreen implements Screen {
 					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
 					return true;
 				}
+				else if (keycode == Input.Keys.DOWN) {
+					ScreenManager.getInstance().show(ScreenName.MAIN_MENU);
+					return true;
+				}
 				return false;
 			}
 		};
 		Gdx.input.setInputProcessor(stage);
-		table = new HorizontalGroup();
-		table.setFillParent(true);
-		stage.addActor(table);
+
 
 
 		skin = new Skin();
@@ -139,14 +141,7 @@ public class ScoreScreen implements Screen {
 				EscargotGame.myRequestHandler.classement();
 			}
 		});
-		
-		table.addActor(retour);
-		table.addActor(sign_in);
-		table.addActor(sign_out);
-		table.addActor(achiev);
-		table.addActor(rank);
-		
-		table.bottom();
+
 		train = new TrainActorTuto(600, 150, 1f,-1,0);
 		train.setTexture(atlas.findRegion("train"));
 		stage.addActor(train);
@@ -155,6 +150,20 @@ public class ScoreScreen implements Screen {
 		spriteRails = new Sprite(railsTexture, 4096, 88);
 		bgdTexture = RessourcesManager.getInstance().getTexture("background_0.jpg");
 		fontVani = RessourcesManager.getInstance().getFont("vanilla.fnt");
+		table = new HorizontalGroup();
+		table.setFillParent(true);
+		stage.addActor(table);
+		table2 = new HorizontalGroup();
+		table2.setFillParent(true);
+		stage.addActor(table2);
+		table.addActor(retour);
+		//table.addActor(sign_out);
+		table2.addActor(achiev);
+		table2.addActor(sign_in);
+		table2.addActor(rank);
+
+		table.bottom();
+		table2.center();
 	}
 
 	@Override
