@@ -106,8 +106,13 @@ public class MainMenuScreen implements Screen {
 		stage.addActor(main_buttons);
 
 		skin = new Skin();
-		// Main buttons
-		TextureAtlas atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
+		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+		TextureAtlas atlas;
+		if(prefs.getBoolean("gold", false)){
+			atlas = RessourcesManager.getInstance().getAtlas("pack_gold.atlas");
+		}else {
+			atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
+		}
 		skin.addRegions(atlas);
 
 		// On TV ?
@@ -313,11 +318,11 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
+		EscargotGame.myRequestHandler.showAds(true);
 		Gdx.input.setInputProcessor(stage);
 		but_son.setVisible(false);
 		but_vibre.setVisible(false);
 		if (EscargotGame.son_on) {
-			sound_train.play();
 			music_bg.play();
 		}
 	}

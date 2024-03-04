@@ -21,6 +21,7 @@ public final class RessourcesManager {
 		manager.load("background_0.jpg", Texture.class);
 		manager.load("rails_0.png", Texture.class);
 		manager.load("pack.atlas", TextureAtlas.class);
+		manager.load("pack_gold.atlas", TextureAtlas.class);
 		manager.load("sound0.mp3", Music.class);
 		manager.load("sound2.wav", Sound.class);
 		manager.load("sound1.wav", Sound.class);

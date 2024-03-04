@@ -17,7 +17,7 @@ public class EscargotGame extends Game implements ApplicationListener {
 	public static boolean son_on = true;
 	public static boolean vibre_on = true;
 	public Screen mainScreen, tutoScreen, gameScreen, endScreen, scoreScreen;
-	public static boolean achievementList[] = { false, false, false, false, false };
+	public static boolean achievementList[] = { false, false, false, false, false, false, false, false, false };
 	public static int playTime = 3;
 	private Preferences prefs;
 	public I18NBundle bundle;

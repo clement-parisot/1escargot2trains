@@ -2,7 +2,9 @@ package com.escargot.game;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.View;
 
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.games.AuthenticationResult;
 import com.google.android.gms.games.GamesSignInClient;
 import com.google.android.gms.games.PlayGames;
@@ -13,23 +15,23 @@ import com.google.android.gms.tasks.Task;
 
 public class GooglePlayService implements IActivityRequestHandler {
 
-    private Activity activity;
+    private AndroidLauncher activity;
     private static final int RC_ACHIEVEMENT_UI = 9003;
     private static final int RC_LEADERBOARD_UI = 9004;
 
-    public void init(Activity a) {
+    public void init(AndroidLauncher a) {
         this.activity = a;
         PlayGamesSdk.initialize(a);
     }
 
     @Override
     public void showAds(boolean show) {
-
+        this.activity.showAds(show);
     }
 
     @Override
     public void show_inter_ads() {
-
+        activity.showInterstitial();
     }
 
     @Override
@@ -43,7 +45,6 @@ public class GooglePlayService implements IActivityRequestHandler {
 
     @Override
     public void beginUserSignIn() {
-        System.out.println("test sign in");
         GamesSignInClient gamesSignInClient = PlayGames.getGamesSignInClient( this.activity);
         gamesSignInClient.signIn();
     }
@@ -75,6 +76,18 @@ public class GooglePlayService implements IActivityRequestHandler {
                 break;
             case 5:
                 PlayGames.getAchievementsClient(this.activity).unlock(activity.getString(R.string.achievement_4000_points));
+                break;
+            case 6:
+                PlayGames.getAchievementsClient(this.activity).unlock(activity.getString(R.string.achievement_10_000_points));
+                break;
+            case 7:
+                PlayGames.getAchievementsClient(this.activity).unlock(activity.getString(R.string.achievement_15_000_points));
+                break;
+            case 8:
+                PlayGames.getAchievementsClient(this.activity).unlock(activity.getString(R.string.achievement_20_000_points));
+                break;
+            case 9:
+                PlayGames.getAchievementsClient(this.activity).unlock(activity.getString(R.string.achievement_25_000_points));
                 break;
         }
     }

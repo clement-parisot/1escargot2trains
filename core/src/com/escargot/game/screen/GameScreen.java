@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
@@ -138,7 +139,13 @@ public class GameScreen implements Screen {
 
 		skin = new Skin();
 		// Load textures
-		TextureAtlas atlas =  RessourcesManager.getInstance().getAtlas("pack.atlas");
+		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+		TextureAtlas atlas;
+		if(prefs.getBoolean("gold", false)){
+			atlas = RessourcesManager.getInstance().getAtlas("pack_gold.atlas");
+		}else {
+			atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
+		}
 		skin.addRegions(atlas);
 		
 		escargot = new EscargotActorTuto(0, 145, 0.16f, 0.6);
@@ -196,7 +203,7 @@ public class GameScreen implements Screen {
 		
 		Texture bgdTexture = RessourcesManager.getInstance().getTexture("background_0.jpg");
 		bgdTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
-		spriteBgd = new Sprite(bgdTexture, 0, 0, 1920, 1080);
+		spriteBgd = new Sprite(bgdTexture, 0, 0, 1920*2, 1115);
 		Texture railsTexture = new Texture(Gdx.files.internal("rails_0.png"));
 		railsTexture.setWrap(TextureWrap.MirroredRepeat,TextureWrap.ClampToEdge);
 		spriteRails = new Sprite(railsTexture, 4096, 88);
@@ -247,7 +254,7 @@ public class GameScreen implements Screen {
 		cameraScore.update();
 		this.batch.begin();
 		this.batch.setProjectionMatrix(cameraGame.combined);
-		//this.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 640, 480);
+		//this.batch.draw(game.manager.get("background_0.jpg",Texture.class), 0, 0, 1920, 1115);
 		scrollTimer+=Gdx.graphics.getDeltaTime()*0.1f;
 		if(scrollTimer>2.0f)
 			scrollTimer = 0.0f;
@@ -256,7 +263,7 @@ public class GameScreen implements Screen {
 		//	     spriteBgd.setU2(scrollTimer+1);
 		//	     spriteRails.setU(scrollTimer);
 		//	     spriteRails.setU2(scrollTimer+1);
-		this.batch.draw(spriteBgd, 0, 0, 1920, 1080);
+		this.batch.draw(spriteBgd, 0, 0, 1920, 1115);
 		this.batch.end();
 		stage.draw();
 		this.batch.begin();
@@ -349,6 +356,7 @@ public class GameScreen implements Screen {
 			music_bg.play();
 		}
 		Gdx.input.setInputProcessor(stage);
+		EscargotGame.myRequestHandler.showAds(false);
 	}
 
 	@Override

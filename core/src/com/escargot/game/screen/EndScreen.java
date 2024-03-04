@@ -86,7 +86,12 @@ public class EndScreen implements Screen {
 		t.setPosition(480, 350, Align.center);
 		
 		skin = new Skin();
-		skin.addRegions(RessourcesManager.getInstance().getAtlas("pack.atlas"));
+		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+		if(prefs.getBoolean("gold", false)){
+			skin.addRegions(RessourcesManager.getInstance().getAtlas("pack_gold.atlas"));
+		}else {
+			skin.addRegions(RessourcesManager.getInstance().getAtlas("pack.atlas"));
+		}
 
 		retour = new Button(skin.getDrawable("back"));
 		retour.addListener(new ChangeListener() {
@@ -137,6 +142,7 @@ public class EndScreen implements Screen {
 
 	@Override
 	public void show() {
+		EscargotGame.myRequestHandler.showAds(true);
 		RessourcesManager.getInstance().finishLoad();
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		prefs.putBoolean("son_on", EscargotGame.son_on);
@@ -170,12 +176,33 @@ public class EndScreen implements Screen {
 			EscargotGame.achievementList[4] = true;
 			prefs.putBoolean("a4", true);
 		}
+		if (scoreNb >= 10000 && !EscargotGame.achievementList[5]) {
+			EscargotGame.myRequestHandler.unlock(5);
+			EscargotGame.achievementList[5] = true;
+			prefs.putBoolean("a5", true);
+		}
+		if (scoreNb >= 15000 && !EscargotGame.achievementList[6]) {
+			EscargotGame.myRequestHandler.unlock(6);
+			EscargotGame.achievementList[6] = true;
+			prefs.putBoolean("a6", true);
+		}
+		if (scoreNb >= 20000 && !EscargotGame.achievementList[7]) {
+			EscargotGame.myRequestHandler.unlock(7);
+			EscargotGame.achievementList[7] = true;
+			prefs.putBoolean("a7", true);
+		}
+		if (scoreNb >= 25000 && !EscargotGame.achievementList[8]) {
+			EscargotGame.myRequestHandler.unlock(8);
+			EscargotGame.achievementList[8] = true;
+			prefs.putBoolean("a8", true);
+			prefs.putBoolean("gold", true);
+		}
 		prefs.flush();
 		Gdx.input.setInputProcessor(stage);
 		score_player.getActor().setText(""+EscargotGame.score_player);
 		bestscore_player.getActor().setText(""+EscargotGame.score_player.getMaxScore());
 		if(EscargotGame.playTime > 3){
-			//EscargotGame.myRequestHandler.show_inter_ads();
+			EscargotGame.myRequestHandler.show_inter_ads();
 			EscargotGame.playTime = 0;
 			System.out.println("show");
 		}

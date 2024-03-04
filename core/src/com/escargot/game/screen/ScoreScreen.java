@@ -2,6 +2,7 @@ package com.escargot.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -84,7 +85,13 @@ public class ScoreScreen implements Screen {
 
 
 		skin = new Skin();
-		TextureAtlas atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
+		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+		TextureAtlas atlas;
+		if(prefs.getBoolean("gold", false)){
+			atlas = RessourcesManager.getInstance().getAtlas("pack_gold.atlas");
+		}else {
+			atlas = RessourcesManager.getInstance().getAtlas("pack.atlas");
+		}
 		skin.addRegions(atlas);
 
 		// Button
@@ -209,6 +216,7 @@ public class ScoreScreen implements Screen {
 
 	@Override
 	public void show() {
+		EscargotGame.myRequestHandler.showAds(true);
 		RessourcesManager.getInstance().finishLoad();
 		Gdx.input.setInputProcessor(stage);
 		if (!EscargotGame.myRequestHandler.isSignedIn()) {

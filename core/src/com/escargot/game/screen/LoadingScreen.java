@@ -39,6 +39,7 @@ public class LoadingScreen implements Screen {
 
 	    @Override
 	    public void show() {
+			EscargotGame.myRequestHandler.showAds(false);
 	        // Tell the manager to load assets for the loading screen
 	    	loader_manager = new AssetManager();
 	        loader_manager.load("loading.pack", TextureAtlas.class);

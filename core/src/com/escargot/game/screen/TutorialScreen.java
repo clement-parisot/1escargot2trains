@@ -438,6 +438,7 @@ public class TutorialScreen implements Screen {
 	
 	@Override
 	public void show() {
+		EscargotGame.myRequestHandler.showAds(false);
 		RessourcesManager.getInstance().finishLoad();
 		pause = false;
 		if (EscargotGame.son_on) {

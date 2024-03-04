@@ -76,7 +76,12 @@ public class SimpleScoreScreen implements Screen {
 		t.setPosition(480, 350, Align.center);
 		
 		skin = new Skin();
-		skin.addRegions(RessourcesManager.getInstance().getAtlas("pack.atlas"));
+		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
+		if(prefs.getBoolean("gold", false)){
+			skin.addRegions(RessourcesManager.getInstance().getAtlas("pack_gold.atlas"));
+		}else {
+			skin.addRegions(RessourcesManager.getInstance().getAtlas("pack.atlas"));
+		}
 
 		retour = new Button(skin.getDrawable("back"));
 		retour.addListener(new ChangeListener() {
@@ -127,6 +132,7 @@ public class SimpleScoreScreen implements Screen {
 
 	@Override
 	public void show() {
+		EscargotGame.myRequestHandler.showAds(true);
 		RessourcesManager.getInstance().finishLoad();
 		Preferences prefs = Gdx.app.getPreferences("Escargot prefs");
 		prefs.putBoolean("son_on", EscargotGame.son_on);
