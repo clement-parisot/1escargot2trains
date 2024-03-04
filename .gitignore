@@ -112,3 +112,7 @@ Thumbs.db
 /ios/xcode/native/
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
+
+/android/release
+/android/res/values/admob-ids.xml
+/android/res/values/games-ids.xml
