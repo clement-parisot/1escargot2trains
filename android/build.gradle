@@ -34,6 +34,11 @@ android {
         implementation "com.google.android.gms:play-services-games-v2:19.0.0"
         implementation 'com.google.android.gms:play-services-ads:22.6.0'
     }
+    defaultConfig {
+        applicationId "com.escargot.game.android"
+        minSdkVersion 8
+        targetSdkVersion 19
+    }
 }
 
 
