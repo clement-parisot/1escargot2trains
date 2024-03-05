@@ -1,0 +1,229 @@
+
+pack_gold.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+achiev
+  rotate: false
+  xy: 512, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+aide
+  rotate: false
+  xy: 576, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+back
+  rotate: false
+  xy: 640, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+escargot
+  rotate: false
+  xy: 512, 832
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 0
+escargot
+  rotate: false
+  xy: 512, 640
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 1
+escargot
+  rotate: false
+  xy: 0, 635
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 2
+escargot
+  rotate: false
+  xy: 512, 448
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 3
+escargot
+  rotate: false
+  xy: 0, 443
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 4
+escargot
+  rotate: false
+  xy: 512, 256
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 5
+escargot
+  rotate: false
+  xy: 0, 251
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 6
+escargot
+  rotate: false
+  xy: 512, 64
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 7
+escargot
+  rotate: false
+  xy: 0, 59
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 8
+escargot_end
+  rotate: false
+  xy: 0, 827
+  size: 512, 197
+  orig: 512, 197
+  offset: 0, 0
+  index: -1
+fastLeft
+  rotate: false
+  xy: 704, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+fastRight
+  rotate: false
+  xy: 768, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+leader
+  rotate: false
+  xy: 832, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+left
+  rotate: false
+  xy: 896, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+param
+  rotate: false
+  xy: 960, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+
+pack_gold2.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+SmokeShape
+  rotate: false
+  xy: 576, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+escargot_full
+  rotate: false
+  xy: 0, 320
+  size: 512, 192
+  orig: 512, 192
+  offset: 0, 0
+  index: 9
+play
+  rotate: false
+  xy: 0, 64
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+right
+  rotate: false
+  xy: 512, 448
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+score
+  rotate: false
+  xy: 0, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+signIn
+  rotate: false
+  xy: 512, 384
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+signOut
+  rotate: false
+  xy: 512, 320
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+son_off
+  rotate: false
+  xy: 64, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+son_on
+  rotate: false
+  xy: 576, 192
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+star
+  rotate: false
+  xy: 832, 448
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+train
+  rotate: false
+  xy: 0, 192
+  size: 576, 128
+  orig: 576, 128
+  offset: 0, 0
+  index: 0
+vibre_off
+  rotate: false
+  xy: 128, 128
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+vibre_on
+  rotate: false
+  xy: 640, 192
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

@@ -1,6 +1,7 @@
 android {
-    buildToolsVersion "23.0.3"
-    compileSdkVersion 19
+    namespace "com.escargot.game"
+    buildToolsVersion "33.0.2"
+    compileSdkVersion 33
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -8,11 +9,30 @@ android {
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
+            assets.srcDirs = ['../assets']
             jniLibs.srcDirs = ['libs']
         }
 
-        instrumentTest.setRoot('tests')
+    }
+    packagingOptions {
+        exclude 'META-INF/robovm/ios/robovm.xml'
+    }
+    defaultConfig {
+        applicationId "com.escargot.game.android"
+        minSdkVersion 19
+        targetSdkVersion 33
+        versionCode 14
+        versionName "1.6.3"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dependencies {
+        implementation "com.google.android.gms:play-services-games-v2:19.0.0"
+        implementation 'com.google.android.gms:play-services-ads:22.6.0'
     }
     defaultConfig {
         applicationId "com.escargot.game.android"
@@ -20,33 +40,40 @@ android {
         targetSdkVersion 19
     }
 }
+
+
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
-task copyAndroidNatives() {
-    file("libs/armeabi/").mkdirs();
-    file("libs/armeabi-v7a/").mkdirs();
-    file("libs/arm64-v8a/").mkdirs();
-    file("libs/x86_64/").mkdirs();
-    file("libs/x86/").mkdirs();
+tasks.register('copyAndroidNatives') {
+    doFirst {
+        file("libs/armeabi-v7a/").mkdirs()
+        file("libs/arm64-v8a/").mkdirs()
+        file("libs/x86_64/").mkdirs()
+        file("libs/x86/").mkdirs()
 
-    configurations.natives.files.each { jar ->
-        def outputDir = null
-        if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-        if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-        if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-        if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-        if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-        if (outputDir != null) {
-            copy {
-                from zipTree(jar)
-                into outputDir
-                include "*.so"
+        configurations.natives.copy().files.each { jar ->
+            def outputDir = null
+            if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
+            if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+            if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+            if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+            if (outputDir != null) {
+                copy {
+                    from zipTree(jar)
+                    into outputDir
+                    include "*.so"
+                }
             }
         }
     }
 }
-task run(type: Exec) {
+
+tasks.matching { it.name.contains("merge") && it.name.contains("JniLibFolders") }.configureEach { packageTask ->
+    packageTask.dependsOn 'copyAndroidNatives'
+}
+
+tasks.register('run', Exec) {
     def path
     def localProperties = project.file("../local.properties")
     if (localProperties.exists()) {
@@ -65,61 +92,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.escargot.game.android/com.escargot.game.android.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.escargot.game/com.escargot.game.AndroidLauncher'
 }
-// sets up the Android Eclipse project, using the old Ant based build.
-eclipse {
-    // need to specify Java source sets explicitly, SpringSource Gradle Eclipse plugin
-    // ignores any nodes added in classpath.file.withXml
-    sourceSets {
-        main {
-            java.srcDirs "src", 'gen'
-        }
-    }
 
-    jdt {
-        sourceCompatibility = 1.6
-        targetCompatibility = 1.6
-    }
-
-    classpath {
-        plusConfigurations += [project.configurations.compile]
-        containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'
-    }
-
-    project {
-        name = appName + "-android"
-        natures 'com.android.ide.eclipse.adt.AndroidNature'
-        buildCommands.clear();
-        buildCommand "com.android.ide.eclipse.adt.ResourceManagerBuilder"
-        buildCommand "com.android.ide.eclipse.adt.PreCompilerBuilder"
-        buildCommand "org.eclipse.jdt.core.javabuilder"
-        buildCommand "com.android.ide.eclipse.adt.ApkBuilder"
-    }
-}
-// sets up the Android Idea project, using the old Ant based build.
-idea {
-    module {
-        sourceDirs += file("src");
-        scopes = [COMPILE: [plus: [project.configurations.compile]]]
-
-        iml {
-            withXml {
-                def node = it.asNode()
-                def builder = NodeBuilder.newInstance();
-                builder.current = node;
-                builder.component(name: "FacetManager") {
-                    facet(type: "android", name: "Android") {
-                        configuration {
-                            option(name: "UPDATE_PROPERTY_FILES", value: "true")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-dependencies {
-    compile 'com.google.android.gms:play-services:9.4.0'
-    compile 'com.google.android.gms:play-services-ads:9.4.0'
-}
+eclipse.project.name = appName + "-android"

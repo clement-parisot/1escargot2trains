@@ -6,7 +6,7 @@ import java.text.Format;
 public class Score {
 	private float score;
 	private static float max_score;
-	private Format df = new DecimalFormat("###,###");
+	private Format df = new DecimalFormat("000,000");
 
 	public Score() {
 		this.score = 0;
@@ -37,8 +37,7 @@ public class Score {
 	}
 
 	public String getMaxScore() {
-		return df.format(max_score);
-		// return ""+(int)max_score;
+		return df.format((int)max_score);
 	}
 
 	public float getMaxScoreValue() {
